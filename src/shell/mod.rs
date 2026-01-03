@@ -373,15 +373,41 @@ PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
         match self.shell_type {
             ShellType::Zsh => r"# Key bindings
 bindkey -e  # Emacs mode
-bindkey '^[[A' history-search-backward
-bindkey '^[[B' history-search-forward
+
+# Up/Down arrow: search history based on what's typed (oh-my-zsh style)
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search    # Up arrow
+bindkey '^[[B' down-line-or-beginning-search  # Down arrow
+bindkey '^[OA' up-line-or-beginning-search    # Up arrow (alternate)
+bindkey '^[OB' down-line-or-beginning-search  # Down arrow (alternate)
+
+# Search
 bindkey '^R' history-incremental-search-backward
 bindkey '^S' history-incremental-search-forward
-bindkey '^[[1;5C' forward-word
-bindkey '^[[1;5D' backward-word
-bindkey '^[[H' beginning-of-line
-bindkey '^[[F' end-of-line
-bindkey '^[[3~' delete-char
+bindkey '^P' up-line-or-beginning-search      # Ctrl-P
+bindkey '^N' down-line-or-beginning-search    # Ctrl-N
+
+# Word navigation
+bindkey '^[[1;5C' forward-word   # Ctrl+Right
+bindkey '^[[1;5D' backward-word  # Ctrl+Left
+bindkey '^[f' forward-word       # Alt+f
+bindkey '^[b' backward-word      # Alt+b
+
+# Line navigation
+bindkey '^[[H' beginning-of-line  # Home
+bindkey '^[[F' end-of-line        # End
+bindkey '^A' beginning-of-line    # Ctrl+A
+bindkey '^E' end-of-line          # Ctrl+E
+
+# Editing
+bindkey '^[[3~' delete-char       # Delete
+bindkey '^?' backward-delete-char # Backspace
+bindkey '^W' backward-kill-word   # Ctrl+W
+bindkey '^U' backward-kill-line   # Ctrl+U
+bindkey '^K' kill-line            # Ctrl+K
+bindkey '^Y' yank                 # Ctrl+Y
 
 "
             .to_string(),
@@ -500,7 +526,7 @@ mod tests {
         let output = generate_init(ShellType::Zsh, config);
 
         assert!(output.contains("bindkey -e"));
-        assert!(output.contains("history-search-backward"));
+        assert!(output.contains("up-line-or-beginning-search"));
         assert!(output.contains("'^R'"));
     }
 
