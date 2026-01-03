@@ -3,8 +3,7 @@
 //! Run with: cargo run --example theme
 
 use pzsh::theme::{
-    Theme, ThemeRegistry,
-    RobbyRussellTheme, AgnosterTheme, SimpleTheme, PureTheme, SpaceshipTheme,
+    AgnosterTheme, PureTheme, RobbyRussellTheme, SimpleTheme, SpaceshipTheme, Theme, ThemeRegistry,
 };
 
 fn main() {
@@ -49,8 +48,10 @@ fn main() {
     // Get theme by name
     if let Some(theme) = registry.get("robbyrussell") {
         println!("Selected theme: {}", theme.name());
-        println!("Prompt preview: PROMPT='{}'",
-            theme.zsh_prompt().lines().next().unwrap_or(""));
+        println!(
+            "Prompt preview: PROMPT='{}'",
+            theme.zsh_prompt().lines().next().unwrap_or("")
+        );
     }
     println!();
 

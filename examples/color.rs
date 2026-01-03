@@ -2,7 +2,7 @@
 //!
 //! Run with: cargo run --example color
 
-use pzsh::color::{Color, ColorSpec, Style, Styled, RESET, themes::DefaultTheme};
+use pzsh::color::{Color, ColorSpec, RESET, Style, Styled, themes::DefaultTheme};
 
 fn main() {
     println!("=== pzsh Color System ===\n");
@@ -10,8 +10,14 @@ fn main() {
     // Basic ANSI colors (16-color palette)
     println!("16-Color Palette:");
     for color in [
-        Color::Black, Color::Red, Color::Green, Color::Yellow,
-        Color::Blue, Color::Magenta, Color::Cyan, Color::White,
+        Color::Black,
+        Color::Red,
+        Color::Green,
+        Color::Yellow,
+        Color::Blue,
+        Color::Magenta,
+        Color::Cyan,
+        Color::White,
     ] {
         let style = Style::new().fg_ansi(color);
         let styled = Styled::new(format!("{color:?}"), style);
@@ -22,8 +28,14 @@ fn main() {
     // Bright colors
     println!("Bright Colors:");
     for color in [
-        Color::BrightBlack, Color::BrightRed, Color::BrightGreen, Color::BrightYellow,
-        Color::BrightBlue, Color::BrightMagenta, Color::BrightCyan, Color::BrightWhite,
+        Color::BrightBlack,
+        Color::BrightRed,
+        Color::BrightGreen,
+        Color::BrightYellow,
+        Color::BrightBlue,
+        Color::BrightMagenta,
+        Color::BrightCyan,
+        Color::BrightWhite,
     ] {
         let style = Style::new().fg_ansi(color);
         let styled = Styled::new(format!("{color:?}"), style);
@@ -35,16 +47,19 @@ fn main() {
     println!("Style Modifiers:");
     println!("  {} - bold text", Styled::new("Bold", Style::new().bold()));
     println!("  {} - dim text", Styled::new("Dim", Style::new().dim()));
-    println!("  {} - italic text", Styled::new("Italic", Style::new().italic()));
-    println!("  {} - underlined text", Styled::new("Underline", Style::new().underline()));
+    println!(
+        "  {} - italic text",
+        Styled::new("Italic", Style::new().italic())
+    );
+    println!(
+        "  {} - underlined text",
+        Styled::new("Underline", Style::new().underline())
+    );
     println!();
 
     // Combined styles
     println!("Combined Styles:");
-    let fancy = Style::new()
-        .fg_ansi(Color::Cyan)
-        .bold()
-        .underline();
+    let fancy = Style::new().fg_ansi(Color::Cyan).bold().underline();
     println!("  {}", Styled::new("Bold + Cyan + Underline", fancy));
     println!();
 
@@ -68,14 +83,35 @@ fn main() {
 
     // Theme styles (oh-my-zsh compatible)
     println!("Default Theme Styles:");
-    println!("  {} - user style", Styled::new("noah", DefaultTheme::user()));
-    println!("  {} - host style", Styled::new("laptop", DefaultTheme::host()));
-    println!("  {} - cwd style", Styled::new("~/src/pzsh", DefaultTheme::cwd()));
-    println!("  {} - git clean", Styled::new("(main)", DefaultTheme::git_clean()));
-    println!("  {} - git dirty", Styled::new("(main*)", DefaultTheme::git_dirty()));
+    println!(
+        "  {} - user style",
+        Styled::new("noah", DefaultTheme::user())
+    );
+    println!(
+        "  {} - host style",
+        Styled::new("laptop", DefaultTheme::host())
+    );
+    println!(
+        "  {} - cwd style",
+        Styled::new("~/src/pzsh", DefaultTheme::cwd())
+    );
+    println!(
+        "  {} - git clean",
+        Styled::new("(main)", DefaultTheme::git_clean())
+    );
+    println!(
+        "  {} - git dirty",
+        Styled::new("(main*)", DefaultTheme::git_dirty())
+    );
     println!("  {} - error", Styled::new("Error!", DefaultTheme::error()));
-    println!("  {} - success", Styled::new("Success", DefaultTheme::success()));
-    println!("  {} - warning", Styled::new("Warning", DefaultTheme::warning()));
+    println!(
+        "  {} - success",
+        Styled::new("Success", DefaultTheme::success())
+    );
+    println!(
+        "  {} - warning",
+        Styled::new("Warning", DefaultTheme::warning())
+    );
     println!();
 
     // Raw ANSI codes

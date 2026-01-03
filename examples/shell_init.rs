@@ -2,9 +2,9 @@
 //!
 //! Run with: cargo run --example shell_init
 
+use pzsh::ShellType;
 use pzsh::config::CompiledConfig;
 use pzsh::shell::generate_init;
-use pzsh::ShellType;
 
 fn main() {
     println!("=== pzsh Shell Initialization ===\n");
@@ -12,9 +12,15 @@ fn main() {
     // Create a sample configuration
     let mut config = CompiledConfig::default();
     config.colors_enabled = true;
-    config.aliases.insert("ll".to_string(), "ls -la".to_string());
-    config.aliases.insert("gs".to_string(), "git status".to_string());
-    config.aliases.insert("gp".to_string(), "git push".to_string());
+    config
+        .aliases
+        .insert("ll".to_string(), "ls -la".to_string());
+    config
+        .aliases
+        .insert("gs".to_string(), "git status".to_string());
+    config
+        .aliases
+        .insert("gp".to_string(), "git push".to_string());
     config.env.insert("EDITOR".to_string(), "vim".to_string());
     config.plugins_enabled = vec!["git".to_string()];
 

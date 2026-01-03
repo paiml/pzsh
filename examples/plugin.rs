@@ -2,8 +2,8 @@
 //!
 //! Run with: cargo run --example plugin
 
-use pzsh::plugin::{Plugin, PluginManager, GitPlugin, DockerPlugin, PluginInfo};
 use pzsh::ShellType;
+use pzsh::plugin::{DockerPlugin, GitPlugin, Plugin, PluginInfo, PluginManager};
 
 fn main() {
     println!("=== pzsh Plugin System ===\n");

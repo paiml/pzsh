@@ -93,10 +93,7 @@ impl ZshCompletion {
                 ));
             } else if !spec.values.is_empty() {
                 let values = spec.values.join(" ");
-                output.push_str(&format!(
-                    "    '*:{}:(({values}))'{comma}\n",
-                    spec.pattern
-                ));
+                output.push_str(&format!("    '*:{}:(({values}))'{comma}\n", spec.pattern));
             }
         }
 
@@ -431,7 +428,8 @@ zle -N _pzsh_history_search_down
 
 bindkey '^[[A' _pzsh_history_search_up    # Up arrow
 bindkey '^[[B' _pzsh_history_search_down  # Down arrow
-"#.to_string()
+"#
+        .to_string()
     }
 }
 
@@ -514,7 +512,8 @@ z() {
 # Hook into chpwd
 autoload -Uz add-zsh-hook
 add-zsh-hook chpwd _pzsh_z_record
-"#.to_string()
+"#
+        .to_string()
     }
 }
 

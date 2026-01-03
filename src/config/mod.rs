@@ -381,9 +381,9 @@ EDITOR = "vim"
         }
         let elapsed = start.elapsed();
 
-        // 1000 compiles should take less than 100ms
+        // 1000 compiles should take less than 500ms (relaxed for coverage builds)
         assert!(
-            elapsed.as_millis() < 100,
+            elapsed.as_millis() < 500,
             "Config compile too slow: {:?}",
             elapsed
         );

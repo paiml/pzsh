@@ -2,13 +2,13 @@
 //!
 //! Run with: cargo run --example completion
 
-use pzsh::completion::{
-    CompletionEngine, CompletionContext, CompletionItem, CompletionKind,
-    AliasCompleter, CompletionProvider,
-};
 use ahash::AHashMap;
-use std::sync::Arc;
+use pzsh::completion::{
+    AliasCompleter, CompletionContext, CompletionEngine, CompletionItem, CompletionKind,
+    CompletionProvider,
+};
 use std::path::PathBuf;
+use std::sync::Arc;
 
 fn main() {
     println!("=== pzsh Completion System ===\n");

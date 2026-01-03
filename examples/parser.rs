@@ -13,20 +13,26 @@ fn main() {
 
     // Create config with aliases
     let mut config = CompiledConfig::default();
-    config.aliases.insert("ll".to_string(), "ls -la".to_string());
-    config.aliases.insert("gs".to_string(), "git status".to_string());
-    config.aliases.insert("gp".to_string(), "git push".to_string());
+    config
+        .aliases
+        .insert("ll".to_string(), "ls -la".to_string());
+    config
+        .aliases
+        .insert("gs".to_string(), "git status".to_string());
+    config
+        .aliases
+        .insert("gp".to_string(), "git push".to_string());
 
     let mut parser = Parser::new(&config);
 
     // Demo parsing different command types
     let commands = vec![
-        "ls -la /tmp",           // Simple command
-        "ll",                    // Alias
-        "cd /home",              // Builtin
-        "git commit -m 'test'",  // Simple command
-        "gs",                    // Alias
-        "",                      // Empty
+        "ls -la /tmp",          // Simple command
+        "ll",                   // Alias
+        "cd /home",             // Builtin
+        "git commit -m 'test'", // Simple command
+        "gs",                   // Alias
+        "",                     // Empty
     ];
 
     println!("Parsing commands:");
@@ -72,7 +78,13 @@ fn main() {
     let _ = parser.parse(cmd);
     let second = start.elapsed();
 
-    println!("  First parse:  {:.3}µs (cache miss)", first.as_nanos() as f64 / 1000.0);
-    println!("  Second parse: {:.3}µs (cache hit)", second.as_nanos() as f64 / 1000.0);
+    println!(
+        "  First parse:  {:.3}µs (cache miss)",
+        first.as_nanos() as f64 / 1000.0
+    );
+    println!(
+        "  Second parse: {:.3}µs (cache hit)",
+        second.as_nanos() as f64 / 1000.0
+    );
     println!("  Cache entries: {}", parser.cache_len());
 }

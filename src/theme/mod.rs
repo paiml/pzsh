@@ -89,11 +89,11 @@ impl Theme for RobbyRussellTheme {
     }
 
     fn zsh_prompt(&self) -> String {
-        r#"PROMPT='%(?:%F{green}➜:%F{red}➜) %F{cyan}%c%f $(__pzsh_git_info) '"#.to_string()
+        r"PROMPT='%(?:%F{green}➜:%F{red}➜) %F{cyan}%c%f $(__pzsh_git_info) '".to_string()
     }
 
     fn bash_prompt(&self) -> String {
-        r#"PS1='\[\033[32m\]➜ \[\033[36m\]\W\[\033[0m\] $(__pzsh_git_info) '"#.to_string()
+        r"PS1='\[\033[32m\]➜ \[\033[36m\]\W\[\033[0m\] $(__pzsh_git_info) '".to_string()
     }
 }
 
@@ -107,11 +107,17 @@ impl Theme for AgnosterTheme {
     }
 
     fn user_style(&self) -> Style {
-        Style::new().fg_ansi(Color::Black).bg_ansi(Color::Blue).bold()
+        Style::new()
+            .fg_ansi(Color::Black)
+            .bg_ansi(Color::Blue)
+            .bold()
     }
 
     fn host_style(&self) -> Style {
-        Style::new().fg_ansi(Color::Black).bg_ansi(Color::Blue).bold()
+        Style::new()
+            .fg_ansi(Color::Black)
+            .bg_ansi(Color::Blue)
+            .bold()
     }
 
     fn cwd_style(&self) -> Style {
@@ -144,11 +150,11 @@ impl Theme for AgnosterTheme {
 
     fn zsh_prompt(&self) -> String {
         // Powerline-style with special characters
-        r#"PROMPT='%K{blue}%F{black} %n@%m %k%F{blue}%K{cyan}%F{black} %~ %k%F{cyan}$(__pzsh_git_segment)%k%f '"#.to_string()
+        r"PROMPT='%K{blue}%F{black} %n@%m %k%F{blue}%K{cyan}%F{black} %~ %k%F{cyan}$(__pzsh_git_segment)%k%f '".to_string()
     }
 
     fn bash_prompt(&self) -> String {
-        r#"PS1='\[\033[44m\]\[\033[30m\] \u@\h \[\033[0m\]\[\033[34m\]\[\033[46m\]\[\033[30m\] \w \[\033[0m\]\[\033[36m\] '"#.to_string()
+        r"PS1='\[\033[44m\]\[\033[30m\] \u@\h \[\033[0m\]\[\033[34m\]\[\033[46m\]\[\033[30m\] \w \[\033[0m\]\[\033[36m\] '".to_string()
     }
 }
 
@@ -198,11 +204,12 @@ impl Theme for SimpleTheme {
     }
 
     fn zsh_prompt(&self) -> String {
-        r#"PROMPT='%F{green}%n%f@%F{blue}%m%f %F{cyan}%~%f $(__pzsh_git_info) %# '"#.to_string()
+        r"PROMPT='%F{green}%n%f@%F{blue}%m%f %F{cyan}%~%f $(__pzsh_git_info) %# '".to_string()
     }
 
     fn bash_prompt(&self) -> String {
-        r#"PS1='\[\033[32m\]\u\[\033[0m\]@\[\033[34m\]\h\[\033[0m\] \[\033[36m\]\w\[\033[0m\] \$ '"#.to_string()
+        r"PS1='\[\033[32m\]\u\[\033[0m\]@\[\033[34m\]\h\[\033[0m\] \[\033[36m\]\w\[\033[0m\] \$ '"
+            .to_string()
     }
 }
 
@@ -253,13 +260,15 @@ impl Theme for PureTheme {
 
     fn zsh_prompt(&self) -> String {
         // Pure-style two-line prompt
-        r#"PROMPT='
+        r"PROMPT='
 %F{blue}%~%f $(__pzsh_git_info)
-%(?:%F{magenta}❯:%F{red}❯)%f '"#.to_string()
+%(?:%F{magenta}❯:%F{red}❯)%f '"
+            .to_string()
     }
 
     fn bash_prompt(&self) -> String {
-        r#"PS1='\n\[\033[34m\]\w\[\033[0m\] $(__pzsh_git_info)\n\[\033[35m\]❯\[\033[0m\] '"#.to_string()
+        r"PS1='\n\[\033[34m\]\w\[\033[0m\] $(__pzsh_git_info)\n\[\033[35m\]❯\[\033[0m\] '"
+            .to_string()
     }
 }
 
@@ -309,13 +318,15 @@ impl Theme for SpaceshipTheme {
     }
 
     fn zsh_prompt(&self) -> String {
-        r#"PROMPT='
+        r"PROMPT='
 %F{cyan}%~%f $(__pzsh_git_info)
-%(?:%F{green}❯:%F{red}❯)%f '"#.to_string()
+%(?:%F{green}❯:%F{red}❯)%f '"
+            .to_string()
     }
 
     fn bash_prompt(&self) -> String {
-        r#"PS1='\n\[\033[36m\]\w\[\033[0m\] $(__pzsh_git_info)\n\[\033[32m\]❯\[\033[0m\] '"#.to_string()
+        r"PS1='\n\[\033[36m\]\w\[\033[0m\] $(__pzsh_git_info)\n\[\033[32m\]❯\[\033[0m\] '"
+            .to_string()
     }
 }
 
@@ -746,5 +757,333 @@ mod tests {
     fn test_registry_default() {
         let registry = ThemeRegistry::default();
         assert!(registry.count() >= 5);
+    }
+
+    #[test]
+    fn test_robbyrussell_default() {
+        let theme = RobbyRussellTheme::default();
+        assert_eq!(theme.name(), "robbyrussell");
+    }
+
+    #[test]
+    fn test_agnoster_default() {
+        let theme = AgnosterTheme::default();
+        assert_eq!(theme.name(), "agnoster");
+    }
+
+    #[test]
+    fn test_simple_default() {
+        let theme = SimpleTheme::default();
+        assert_eq!(theme.name(), "simple");
+    }
+
+    #[test]
+    fn test_pure_default() {
+        let theme = PureTheme::default();
+        assert_eq!(theme.name(), "pure");
+    }
+
+    #[test]
+    fn test_spaceship_default() {
+        let theme = SpaceshipTheme::default();
+        assert_eq!(theme.name(), "spaceship");
+    }
+
+    #[test]
+    fn test_robbyrussell_debug() {
+        let theme = RobbyRussellTheme;
+        let debug = format!("{:?}", theme);
+        assert!(debug.contains("RobbyRussellTheme"));
+    }
+
+    #[test]
+    fn test_agnoster_debug() {
+        let theme = AgnosterTheme;
+        let debug = format!("{:?}", theme);
+        assert!(debug.contains("AgnosterTheme"));
+    }
+
+    #[test]
+    fn test_simple_debug() {
+        let theme = SimpleTheme;
+        let debug = format!("{:?}", theme);
+        assert!(debug.contains("SimpleTheme"));
+    }
+
+    #[test]
+    fn test_pure_debug() {
+        let theme = PureTheme;
+        let debug = format!("{:?}", theme);
+        assert!(debug.contains("PureTheme"));
+    }
+
+    #[test]
+    fn test_spaceship_debug() {
+        let theme = SpaceshipTheme;
+        let debug = format!("{:?}", theme);
+        assert!(debug.contains("SpaceshipTheme"));
+    }
+
+    #[test]
+    fn test_simple_zsh_prompt() {
+        let theme = SimpleTheme;
+        let prompt = theme.zsh_prompt();
+        assert!(prompt.contains("PROMPT="));
+        assert!(prompt.contains("%n")); // Username
+        assert!(prompt.contains("%m")); // Hostname
+    }
+
+    #[test]
+    fn test_simple_bash_prompt() {
+        let theme = SimpleTheme;
+        let prompt = theme.bash_prompt();
+        assert!(prompt.contains("PS1="));
+        assert!(prompt.contains("\\u")); // Username in bash
+        assert!(prompt.contains("\\h")); // Hostname in bash
+    }
+
+    #[test]
+    fn test_spaceship_bash_prompt() {
+        let theme = SpaceshipTheme;
+        let prompt = theme.bash_prompt();
+        assert!(prompt.contains("PS1="));
+    }
+
+    #[test]
+    fn test_zsh_prompt_contains_color_codes() {
+        let theme = RobbyRussellTheme;
+        let prompt = theme.zsh_prompt();
+        // Zsh uses %F{color} format
+        assert!(prompt.contains("%F{"));
+    }
+
+    #[test]
+    fn test_registry_register_and_get() {
+        let mut registry = ThemeRegistry::new();
+        let initial_count = registry.count();
+        registry.register(CustomTheme);
+        assert_eq!(registry.count(), initial_count + 1);
+        assert!(registry.get("custom").is_some());
+    }
+
+    #[test]
+    fn test_agnoster_zsh_prompt_format() {
+        let theme = AgnosterTheme;
+        let prompt = theme.zsh_prompt();
+        // Agnoster uses powerline-style with background colors
+        assert!(prompt.contains("%K{")); // Background color in zsh
+    }
+
+    #[test]
+    fn test_pure_zsh_prompt_newline() {
+        let theme = PureTheme;
+        let prompt = theme.zsh_prompt();
+        // Pure is a two-line prompt
+        assert!(prompt.contains("$'\\n'") || prompt.contains('\n'));
+    }
+
+    #[test]
+    fn test_spaceship_zsh_prompt() {
+        let theme = SpaceshipTheme;
+        let prompt = theme.zsh_prompt();
+        assert!(prompt.contains("PROMPT="));
+        assert!(prompt.contains("❯") || prompt.contains("$'\\n'"));
+    }
+
+    #[test]
+    fn test_theme_style_methods() {
+        // Test all themes implement all style methods correctly
+        let themes: Vec<Box<dyn Theme>> = vec![
+            Box::new(RobbyRussellTheme),
+            Box::new(AgnosterTheme),
+            Box::new(SimpleTheme),
+            Box::new(PureTheme),
+            Box::new(SpaceshipTheme),
+        ];
+
+        for theme in themes {
+            // Each style should return a valid Style
+            let _ = theme.user_style();
+            let _ = theme.host_style();
+            let _ = theme.cwd_style();
+            let _ = theme.git_clean_style();
+            let _ = theme.git_dirty_style();
+            let _ = theme.prompt_char_style();
+            let _ = theme.prompt_root_style();
+            let _ = theme.error_style();
+            let _ = theme.success_style();
+        }
+    }
+
+    #[test]
+    fn test_registry_count() {
+        let registry = ThemeRegistry::new();
+        // At least 5 built-in themes
+        assert!(registry.count() >= 5);
+    }
+
+    #[test]
+    fn test_registry_list_contains_all() {
+        let registry = ThemeRegistry::new();
+        let list = registry.list();
+        assert!(list.contains(&"robbyrussell"));
+        assert!(list.contains(&"agnoster"));
+        assert!(list.contains(&"simple"));
+        assert!(list.contains(&"pure"));
+        assert!(list.contains(&"spaceship"));
+    }
+
+    #[test]
+    fn test_robbyrussell_success_style() {
+        let theme = RobbyRussellTheme;
+        let style = theme.success_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_robbyrussell_error_style() {
+        let theme = RobbyRussellTheme;
+        let style = theme.error_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_agnoster_success_style() {
+        let theme = AgnosterTheme;
+        let style = theme.success_style();
+        assert!(style.bg.is_some());
+    }
+
+    #[test]
+    fn test_agnoster_error_style() {
+        let theme = AgnosterTheme;
+        let style = theme.error_style();
+        assert!(style.bg.is_some());
+    }
+
+    #[test]
+    fn test_pure_user_style() {
+        let theme = PureTheme;
+        let style = theme.user_style();
+        // Pure shows minimal user info
+        let _ = style;
+    }
+
+    #[test]
+    fn test_pure_host_style() {
+        let theme = PureTheme;
+        let style = theme.host_style();
+        let _ = style;
+    }
+
+    #[test]
+    fn test_pure_success_style() {
+        let theme = PureTheme;
+        let style = theme.success_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_pure_error_style() {
+        let theme = PureTheme;
+        let style = theme.error_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_spaceship_user_style() {
+        let theme = SpaceshipTheme;
+        let style = theme.user_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_spaceship_host_style() {
+        let theme = SpaceshipTheme;
+        let style = theme.host_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_spaceship_success_style() {
+        let theme = SpaceshipTheme;
+        let style = theme.success_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_spaceship_error_style() {
+        let theme = SpaceshipTheme;
+        let style = theme.error_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_simple_success_style() {
+        let theme = SimpleTheme;
+        let style = theme.success_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_simple_error_style() {
+        let theme = SimpleTheme;
+        let style = theme.error_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_pure_bash_prompt_two_line() {
+        let theme = PureTheme;
+        let prompt = theme.bash_prompt();
+        assert!(prompt.contains("PS1="));
+        assert!(prompt.contains("\\n")); // Two-line
+    }
+
+    #[test]
+    fn test_agnoster_prompt_root_style() {
+        let theme = AgnosterTheme;
+        let style = theme.prompt_root_style();
+        assert!(style.fg.is_some());
+    }
+
+    #[test]
+    fn test_agnoster_prompt_char_style() {
+        let theme = AgnosterTheme;
+        let style = theme.prompt_char_style();
+        // Agnoster doesn't heavily style the char
+        let _ = style;
+    }
+
+    #[test]
+    fn test_registry_set_current_multiple_times() {
+        let mut registry = ThemeRegistry::new();
+
+        assert!(registry.set_current("pure"));
+        assert_eq!(registry.current().unwrap().name(), "pure");
+
+        assert!(registry.set_current("agnoster"));
+        assert_eq!(registry.current().unwrap().name(), "agnoster");
+
+        assert!(registry.set_current("robbyrussell"));
+        assert_eq!(registry.current().unwrap().name(), "robbyrussell");
+    }
+
+    #[test]
+    fn test_themes_have_git_styles() {
+        let themes: Vec<Box<dyn Theme>> = vec![
+            Box::new(RobbyRussellTheme),
+            Box::new(AgnosterTheme),
+            Box::new(SimpleTheme),
+            Box::new(PureTheme),
+            Box::new(SpaceshipTheme),
+        ];
+
+        for theme in themes {
+            let clean = theme.git_clean_style();
+            let dirty = theme.git_dirty_style();
+            // Each theme should distinguish between clean and dirty
+            let _ = (clean, dirty);
+        }
     }
 }

@@ -3,8 +3,8 @@
 //! Run with: cargo run --example zsh_features
 
 use pzsh::zsh::{
-    ZshCompletion, CompletionSpec, AutoSuggestWidget, SyntaxHighlighter,
-    HistorySearch, DirectoryJump,
+    AutoSuggestWidget, CompletionSpec, DirectoryJump, HistorySearch, SyntaxHighlighter,
+    ZshCompletion,
 };
 
 fn main() {
@@ -16,16 +16,18 @@ fn main() {
     let mut completion = ZshCompletion::new();
 
     // Register custom completions
-    completion.register("myapp", vec![
-        CompletionSpec::flag("-v", "Verbose output"),
-        CompletionSpec::flag("--help", "Show help"),
-        CompletionSpec::flag("--config", "Config file path"),
-        CompletionSpec::value("command", vec![
-            "build".to_string(),
-            "test".to_string(),
-            "run".to_string(),
-        ]),
-    ]);
+    completion.register(
+        "myapp",
+        vec![
+            CompletionSpec::flag("-v", "Verbose output"),
+            CompletionSpec::flag("--help", "Show help"),
+            CompletionSpec::flag("--config", "Config file path"),
+            CompletionSpec::value(
+                "command",
+                vec!["build".to_string(), "test".to_string(), "run".to_string()],
+            ),
+        ],
+    );
 
     println!("Generated completion for 'myapp':");
     if let Some(script) = completion.generate_completion_function("myapp") {
@@ -112,7 +114,7 @@ fn main() {
     // Record directory visits (frecency-based)
     jump.record("/home/user/src/pzsh");
     jump.record("/home/user/src/project");
-    jump.record("/home/user/src/pzsh");  // visited again (higher score)
+    jump.record("/home/user/src/pzsh"); // visited again (higher score)
     jump.record("/home/user/documents");
 
     println!("Find 'pzsh':");

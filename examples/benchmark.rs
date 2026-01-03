@@ -2,8 +2,8 @@
 //!
 //! Run with: cargo run --example benchmark
 
-use pzsh::config::CompiledConfig;
 use pzsh::Pzsh;
+use pzsh::config::CompiledConfig;
 use std::time::Instant;
 
 fn main() {

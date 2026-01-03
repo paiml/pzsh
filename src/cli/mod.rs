@@ -615,10 +615,7 @@ source ~/.nvm/nvm.sh
 "#;
         let result = lint_config(content);
         assert!(!result.issues.is_empty());
-        assert!(result
-            .issues
-            .iter()
-            .any(|i| i.message.contains("NVM")));
+        assert!(result.issues.iter().any(|i| i.message.contains("NVM")));
     }
 
     #[test]
@@ -628,10 +625,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 "#;
         let result = lint_config(content);
         assert!(!result.issues.is_empty());
-        assert!(result
-            .issues
-            .iter()
-            .any(|i| i.message.contains("conda")));
+        assert!(result.issues.iter().any(|i| i.message.contains("conda")));
     }
 
     #[test]
@@ -641,10 +635,7 @@ eval "$(pyenv init -)"
 "#;
         let result = lint_config(content);
         assert!(!result.passed());
-        assert!(result
-            .issues
-            .iter()
-            .any(|i| i.message.contains("eval")));
+        assert!(result.issues.iter().any(|i| i.message.contains("eval")));
     }
 
     #[test]

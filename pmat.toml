@@ -12,7 +12,7 @@ falsification_checklist = true
 mutation_threshold = 95
 
 [testing]
-unit_coverage_threshold = 90
+unit_coverage_threshold = 95
 integration_coverage_threshold = 80
 mutation_score_threshold = 95
 property_tests = true

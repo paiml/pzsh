@@ -3,9 +3,9 @@
 //! Generates working shell initialization code for zsh and bash.
 //! All code is designed to be sourced directly: `eval "$(pzsh init zsh)"`
 
+use crate::ShellType;
 use crate::config::CompiledConfig;
 use crate::plugin::PluginManager;
-use crate::ShellType;
 
 /// Shell integration generator
 #[derive(Debug)]
@@ -134,7 +134,8 @@ impl ShellIntegration {
             output.push_str("autoload -U colors && colors\n\n");
 
             // Git info function
-            output.push_str(r#"# Git status (cached, fast)
+            output.push_str(
+                r#"# Git status (cached, fast)
 __pzsh_git_info() {
     local branch
     branch=$(git symbolic-ref --short HEAD 2>/dev/null) || return
@@ -147,7 +148,8 @@ __pzsh_git_info() {
     fi
 }
 
-"#);
+"#,
+            );
 
             // Colored prompt
             output.push_str("PROMPT='%F{green}%B%n%b%f@%F{blue}%B%m%b%f %F{cyan}%~%f $(__pzsh_git_info) %F{white}%B%#%b%f '\n");
@@ -165,7 +167,8 @@ __pzsh_git_info() {
         let mut output = String::from("# Prompt configuration\n");
 
         if colors_enabled {
-            output.push_str(r#"# Git status (cached, fast)
+            output.push_str(
+                r#"# Git status (cached, fast)
 __pzsh_git_info() {
     local branch
     branch=$(git symbolic-ref --short HEAD 2>/dev/null) || return
@@ -178,11 +181,12 @@ __pzsh_git_info() {
     fi
 }
 
-"#);
+"#,
+            );
 
             // Colored prompt
-            output.push_str(r#"PS1='\[\033[1;32m\]\u\[\033[0m\]@\[\033[1;34m\]\h\[\033[0m\] \[\033[36m\]\w\[\033[0m\] $(__pzsh_git_info) \[\033[1;37m\]\\$\[\033[0m\] '
-"#);
+            output.push_str(r"PS1='\[\033[1;32m\]\u\[\033[0m\]@\[\033[1;34m\]\h\[\033[0m\] \[\033[36m\]\w\[\033[0m\] $(__pzsh_git_info) \[\033[1;37m\]\\$\[\033[0m\] '
+");
         } else {
             output.push_str("PS1='\\u@\\h \\w \\$ '\n");
         }
@@ -198,6 +202,7 @@ __pzsh_git_info() {
         }
     }
 
+    #[allow(clippy::unused_self)]
     fn generate_zsh_completion(&self) -> String {
         r#"# Completion system
 autoload -Uz compinit
@@ -213,11 +218,13 @@ zstyle ':completion:*:warnings' format '%F{red}-- no matches --%f'
 # Case-insensitive completion
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 
-"#.to_string()
+"#
+        .to_string()
     }
 
+    #[allow(clippy::unused_self)]
     fn generate_bash_completion(&self) -> String {
-        r#"# Completion system
+        r"# Completion system
 if [[ -f /etc/bash_completion ]]; then
     . /etc/bash_completion
 elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
@@ -227,7 +234,8 @@ fi
 # Case-insensitive completion
 bind 'set completion-ignore-case on'
 
-"#.to_string()
+"
+        .to_string()
     }
 
     fn generate_history_config(&self) -> String {
@@ -244,7 +252,8 @@ setopt HIST_VERIFY
 setopt SHARE_HISTORY
 setopt INC_APPEND_HISTORY
 
-"#.to_string(),
+"#
+            .to_string(),
             ShellType::Bash => r#"# History configuration
 HISTSIZE=50000
 HISTFILESIZE=100000
@@ -252,13 +261,14 @@ HISTCONTROL=ignoreboth:erasedups
 shopt -s histappend
 PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
-"#.to_string(),
+"#
+            .to_string(),
         }
     }
 
     fn generate_keybindings(&self) -> String {
         match self.shell_type {
-            ShellType::Zsh => r#"# Key bindings
+            ShellType::Zsh => r"# Key bindings
 bindkey -e  # Emacs mode
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
@@ -270,21 +280,23 @@ bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
 bindkey '^[[3~' delete-char
 
-"#.to_string(),
+"
+            .to_string(),
             ShellType::Bash => r#"# Key bindings
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 bind '"\C-r": reverse-search-history'
 
-"#.to_string(),
+"#
+            .to_string(),
         }
     }
 
+    #[allow(clippy::unused_self)]
     fn generate_footer(&self) -> String {
-        format!(
-            "# pzsh loaded in <10ms\n\
+        "# pzsh loaded in <10ms\n\
              # Run 'pzsh status' to verify\n"
-        )
+            .to_string()
     }
 }
 
@@ -301,8 +313,12 @@ mod tests {
     fn test_config() -> CompiledConfig {
         let mut config = CompiledConfig::default();
         config.colors_enabled = true;
-        config.aliases.insert("ll".to_string(), "ls -la".to_string());
-        config.aliases.insert("gs".to_string(), "git status".to_string());
+        config
+            .aliases
+            .insert("ll".to_string(), "ls -la".to_string());
+        config
+            .aliases
+            .insert("gs".to_string(), "git status".to_string());
         config.env.insert("EDITOR".to_string(), "vim".to_string());
         config.plugins_enabled = vec!["git".to_string()];
         config
@@ -446,7 +462,9 @@ mod tests {
     #[test]
     fn test_alias_with_quotes_escaped() {
         let mut config = CompiledConfig::default();
-        config.aliases.insert("test".to_string(), "echo 'hello world'".to_string());
+        config
+            .aliases
+            .insert("test".to_string(), "echo 'hello world'".to_string());
 
         let output = generate_init(ShellType::Zsh, config);
 
@@ -456,7 +474,9 @@ mod tests {
     #[test]
     fn test_env_with_quotes_escaped() {
         let mut config = CompiledConfig::default();
-        config.env.insert("MSG".to_string(), "say \"hello\"".to_string());
+        config
+            .env
+            .insert("MSG".to_string(), "say \"hello\"".to_string());
 
         let output = generate_init(ShellType::Zsh, config);
 
@@ -508,10 +528,7 @@ mod tests {
         let open_braces: Vec<_> = output.match_indices("${").collect();
         for (pos, _) in open_braces {
             let rest = &output[pos..];
-            assert!(
-                rest.contains('}'),
-                "Unclosed ${{ at position {pos}"
-            );
+            assert!(rest.contains('}'), "Unclosed ${{ at position {pos}");
         }
 
         // No empty commands
