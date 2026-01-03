@@ -224,11 +224,48 @@ cargo bench
 cargo llvm-cov --html
 ```
 
+## 📖 Examples
+
+```bash
+# Color system demo
+cargo run --example color
+
+# Theme preview (robbyrussell, agnoster, pure, minimal)
+cargo run --example theme
+
+# Plugin system (git, docker aliases)
+cargo run --example plugin
+
+# Completion system
+cargo run --example completion
+
+# Shell initialization script
+cargo run --example shell_init
+
+# Zsh features (autocd, history, keybindings)
+cargo run --example zsh_features
+
+# Benchmark performance
+cargo run --example benchmark
+
+# Configuration parsing
+cargo run --example basic_config
+
+# Lint configuration
+cargo run --example lint_config
+
+# Prompt rendering
+cargo run --example prompt
+
+# Parser demo
+cargo run --example parser
+```
+
 ## 🔗 Built With
 
 - [bashrs](https://crates.io/crates/bashrs) v6.48 - Rust↔Shell transpiler
 - [aprender-shell](https://crates.io/crates/aprender-shell) v0.2 - ML completions
-- [trueno](https://crates.io/crates/trueno) v0.10 - SIMD acceleration
+- [trueno](https://crates.io/crates/trueno) v0.11 - SIMD acceleration
 
 ## 📚 Toyota Way
 

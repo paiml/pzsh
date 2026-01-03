@@ -38,6 +38,7 @@
 - [Basic Configuration](./examples/basic.md)
 - [Developer Setup](./examples/developer.md)
 - [Minimal Shell](./examples/minimal.md)
+- [Rust API](./examples/rust-api.md)
 
 # Architecture
 

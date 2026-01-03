@@ -9,7 +9,7 @@ Create `~/.pzshrc`:
 ```toml
 # pzsh configuration
 [pzsh]
-version = "0.1.0"
+version = "0.2.0"
 shell = "zsh"
 
 [performance]
@@ -73,6 +73,6 @@ cargo run --example zsh_features
 
 ```bash
 pzsh status
-# pzsh v0.1.0
+# pzsh v0.2.0
 # Startup: 0.00ms (budget: 10ms) ✓
 ```

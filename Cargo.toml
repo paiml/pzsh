@@ -1,6 +1,6 @@
 [package]
 name = "pzsh"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 authors = ["paiml"]
 description = "Performance-first shell framework with sub-10ms startup"
@@ -75,6 +75,30 @@ path = "examples/parser.rs"
 [[example]]
 name = "prompt"
 path = "examples/prompt.rs"
+
+[[example]]
+name = "color"
+path = "examples/color.rs"
+
+[[example]]
+name = "completion"
+path = "examples/completion.rs"
+
+[[example]]
+name = "plugin"
+path = "examples/plugin.rs"
+
+[[example]]
+name = "shell_init"
+path = "examples/shell_init.rs"
+
+[[example]]
+name = "theme"
+path = "examples/theme.rs"
+
+[[example]]
+name = "zsh_features"
+path = "examples/zsh_features.rs"
 
 [profile.release]
 lto = true
