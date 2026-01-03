@@ -202,24 +202,91 @@ __pzsh_git_info() {
         }
     }
 
-    #[allow(clippy::unused_self)]
     fn generate_zsh_completion(&self) -> String {
-        r#"# Completion system
+        let colors_enabled = self.config.colors_enabled;
+
+        let mut output = String::from(
+            r#"# Completion system - oh-my-zsh compatible
+# Ensure system completions are in fpath
+[[ -d /usr/share/zsh/site-functions ]] && fpath=(/usr/share/zsh/site-functions $fpath)
+[[ -d /usr/share/zsh/functions/Completion/Unix ]] && fpath=(/usr/share/zsh/functions/Completion/Unix $fpath)
+[[ -d /usr/share/zsh/functions/Completion/Linux ]] && fpath=(/usr/share/zsh/functions/Completion/Linux $fpath)
+[[ -d /usr/local/share/zsh/site-functions ]] && fpath=(/usr/local/share/zsh/site-functions $fpath)
+[[ -d ~/.zsh/completions ]] && fpath=(~/.zsh/completions $fpath)
+
 autoload -Uz compinit
 compinit -C -d "${ZDOTDIR:-$HOME}/.zcompdump"
 
-# Completion styling
+# Load bashcompinit for bash completion compatibility
+autoload -Uz bashcompinit && bashcompinit
+
+# Completion styling (oh-my-zsh defaults)
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*' squeeze-slashes true
+
+"#,
+        );
+
+        if colors_enabled {
+            output.push_str(
+                r#"# Colored completions
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
-zstyle ':completion:*:warnings' format '%F{red}-- no matches --%f'
+zstyle ':completion:*:corrections' format '%F{green}-- %d (errors: %e) --%f'
+zstyle ':completion:*:messages' format '%F{purple}-- %d --%f'
+zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 
-# Case-insensitive completion
-zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+"#,
+            );
+        } else {
+            output.push_str(
+                r#"# Plain completions (no colors)
+zstyle ':completion:*:descriptions' format '-- %d --'
+zstyle ':completion:*:corrections' format '-- %d (errors: %e) --'
+zstyle ':completion:*:messages' format '-- %d --'
+zstyle ':completion:*:warnings' format '-- no matches found --'
 
-"#
-        .to_string()
+"#,
+            );
+        }
+
+        output.push_str(
+            r#"zstyle ':completion:*' group-name ''
+
+# Fuzzy matching (typo tolerance)
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 2 numeric
+
+# Process completion
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*' force-list always
+
+# Git completion enhancements
+zstyle ':completion:*:*:git:*' script ~/.zsh/completions/_git 2>/dev/null
+zstyle ':completion:*:git-checkout:*' sort false
+zstyle ':completion:*:git:*' tag-order 'common-commands' 'all-commands'
+
+# Directory completion
+zstyle ':completion:*' list-dirs-first true
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
+# SSH/SCP/RSYNC completion from known_hosts
+zstyle ':completion:*:(ssh|scp|rsync):*' hosts $(
+    cat ~/.ssh/known_hosts 2>/dev/null | grep -v '^[|#]' | cut -d' ' -f1 | cut -d',' -f1 | sort -u
+)
+
+# Caching for expensive completions
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "${ZDOTDIR:-$HOME}/.zcompcache"
+
+"#,
+        );
+
+        output
     }
 
     #[allow(clippy::unused_self)]
