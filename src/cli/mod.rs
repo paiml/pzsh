@@ -421,6 +421,7 @@ pub fn generate_init_config(shell: &str) -> String {
     format!(
         r#"# pzsh configuration
 # Performance-first shell framework with sub-10ms startup
+# oh-my-zsh compatible features without the overhead
 
 [pzsh]
 version = "0.1.0"
@@ -432,15 +433,28 @@ prompt_budget_ms = 2
 lazy_load = true
 
 [prompt]
+# Format: {{user}}, {{host}}, {{cwd}}, {{git}}, {{char}}
 format = "{{user}}@{{host}} {{cwd}} {{git}} {{char}} "
 git_async = true
 git_cache_ms = 1000
+# Enable ANSI colors in prompt (oh-my-zsh style)
+colors = true
 
 [aliases]
 # Add your aliases here (no subprocess calls!)
+# Common git aliases (like oh-my-zsh git plugin)
 ll = "ls -la"
+la = "ls -A"
+l = "ls -CF"
 gs = "git status"
+ga = "git add"
+gc = "git commit"
 gp = "git push"
+gl = "git pull"
+gd = "git diff"
+gco = "git checkout"
+gb = "git branch"
+glog = "git log --oneline --graph"
 
 [env]
 # Add your environment variables here (pre-resolved paths only!)
@@ -448,13 +462,88 @@ EDITOR = "vim"
 # GOROOT = "/usr/local/opt/go/libexec"  # Example: hardcoded, not $(brew --prefix)
 
 [plugins]
+# Built-in plugins: git, docker
+# Plugins provide aliases and shell integration while maintaining O(1) startup
 enabled = ["git"]
-lazy = []
+lazy = ["docker"]
+
+[completion]
+# Enable intelligent auto-complete
+enabled = true
+# Use aprender-shell ML model for predictions (when available)
+# model_path = "~/.pzsh/models/aprender-shell.onnx"
 
 [keybindings]
 # ctrl-r = "history-search"
+# ctrl-p = "completion-prev"
+# ctrl-n = "completion-next"
 "#
     )
+}
+
+/// Generate shell initialization script
+#[must_use]
+pub fn generate_shell_init(shell: &str) -> String {
+    match shell {
+        "bash" => generate_bash_init(),
+        _ => generate_zsh_init(),
+    }
+}
+
+fn generate_zsh_init() -> String {
+    r#"# pzsh initialization for zsh
+# Add to your .zshrc: eval "$(pzsh init zsh)"
+
+# Completion system
+autoload -Uz compinit
+compinit -C  # -C for faster startup (skip security check)
+
+# Enable colors
+autoload -U colors && colors
+
+# History settings (optimized)
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+
+# Key bindings
+bindkey -e  # Emacs mode (or use -v for vi mode)
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
+bindkey '^R' history-incremental-search-backward
+
+# Load pzsh config
+if [[ -f ~/.pzshrc ]]; then
+    # Source compiled config (O(1))
+    source <(pzsh compile --config ~/.pzshrc 2>/dev/null || echo "")
+fi
+"#
+    .to_string()
+}
+
+fn generate_bash_init() -> String {
+    r#"# pzsh initialization for bash
+# Add to your .bashrc: eval "$(pzsh init bash)"
+
+# Enable colors
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+
+# History settings
+HISTSIZE=10000
+HISTFILESIZE=20000
+HISTCONTROL=ignoreboth
+shopt -s histappend
+
+# Load pzsh config
+if [[ -f ~/.pzshrc ]]; then
+    # Source compiled config (O(1))
+    eval "$(pzsh compile --config ~/.pzshrc 2>/dev/null || echo "")"
+fi
+"#
+    .to_string()
 }
 
 #[cfg(test)]
@@ -695,5 +784,42 @@ eval "$(pyenv init -)"
     fn test_generate_init_config_bash() {
         let config = generate_init_config("bash");
         assert!(config.contains("shell = \"bash\""));
+    }
+
+    #[test]
+    fn test_generate_init_config_has_colors() {
+        let config = generate_init_config("zsh");
+        assert!(config.contains("colors = true"));
+    }
+
+    #[test]
+    fn test_generate_init_config_has_completion() {
+        let config = generate_init_config("zsh");
+        assert!(config.contains("[completion]"));
+        assert!(config.contains("aprender-shell"));
+    }
+
+    #[test]
+    fn test_generate_init_config_has_plugins() {
+        let config = generate_init_config("zsh");
+        assert!(config.contains("[plugins]"));
+        assert!(config.contains("git"));
+        assert!(config.contains("docker"));
+    }
+
+    #[test]
+    fn test_generate_shell_init_zsh() {
+        let init = generate_shell_init("zsh");
+        assert!(init.contains("compinit"));
+        assert!(init.contains("colors"));
+        assert!(init.contains("HISTSIZE"));
+    }
+
+    #[test]
+    fn test_generate_shell_init_bash() {
+        let init = generate_shell_init("bash");
+        assert!(init.contains("CLICOLOR"));
+        assert!(init.contains("HISTSIZE"));
+        assert!(init.contains("shopt"));
     }
 }

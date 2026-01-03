@@ -22,6 +22,9 @@
 - [Environment Variables](./configuration/environment.md)
 - [Plugins](./configuration/plugins.md)
 - [Prompt](./configuration/prompt.md)
+- [Colors](./configuration/colors.md)
+- [Themes](./configuration/themes.md)
+- [Completion](./configuration/completion.md)
 
 # CLI Reference
 

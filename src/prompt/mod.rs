@@ -3,6 +3,7 @@
 //! O(1) prompt rendering with 2ms budget constraint.
 //! Git status is async-updated, never blocks.
 
+use crate::color::{Styled, themes::DefaultTheme};
 use crate::config::CompiledConfig;
 use crate::{MAX_PROMPT_MS, PzshError, Result};
 use std::sync::Arc;
@@ -64,10 +65,26 @@ impl GitCache {
     /// Render git status string
     #[must_use]
     pub fn render(&self) -> String {
+        self.render_colored(false)
+    }
+
+    /// Render git status with optional colors
+    #[must_use]
+    pub fn render_colored(&self, colors: bool) -> String {
         match &self.branch {
             Some(branch) => {
                 let dirty_marker = if self.dirty { "*" } else { "" };
-                format!("({branch}{dirty_marker})")
+                let text = format!("({branch}{dirty_marker})");
+                if colors {
+                    let style = if self.dirty {
+                        DefaultTheme::git_dirty()
+                    } else {
+                        DefaultTheme::git_clean()
+                    };
+                    Styled::new(text, style).render()
+                } else {
+                    text
+                }
             }
             None => String::new(),
         }
@@ -84,6 +101,8 @@ pub struct Prompt {
     /// Cached values
     user: String,
     host: String,
+    /// Color support enabled
+    colors_enabled: bool,
 }
 
 impl Prompt {
@@ -99,12 +118,27 @@ impl Prompt {
             .and_then(|h| h.into_string().ok())
             .unwrap_or_else(|| "localhost".to_string());
 
+        // Check color support
+        let colors_enabled = config.colors_enabled && crate::color::supports_color();
+
         Self {
             segments,
             git_cache: GitCache::new(),
             user,
             host,
+            colors_enabled,
         }
+    }
+
+    /// Enable or disable colors
+    pub fn set_colors_enabled(&mut self, enabled: bool) {
+        self.colors_enabled = enabled && crate::color::supports_color();
+    }
+
+    /// Check if colors are enabled
+    #[must_use]
+    pub const fn colors_enabled(&self) -> bool {
+        self.colors_enabled
     }
 
     /// Parse format string into segments
@@ -158,27 +192,53 @@ impl Prompt {
     pub fn render(&self) -> Result<String> {
         let start = Instant::now();
 
-        let mut output = String::with_capacity(128);
+        let mut output = String::with_capacity(256);
 
         for segment in &self.segments {
             match segment {
                 PromptSegment::Literal(s) => output.push_str(s),
-                PromptSegment::User => output.push_str(&self.user),
-                PromptSegment::Host => output.push_str(&self.host),
+                PromptSegment::User => {
+                    if self.colors_enabled {
+                        output.push_str(&Styled::new(&self.user, DefaultTheme::user()).render());
+                    } else {
+                        output.push_str(&self.user);
+                    }
+                }
+                PromptSegment::Host => {
+                    if self.colors_enabled {
+                        output.push_str(&Styled::new(&self.host, DefaultTheme::host()).render());
+                    } else {
+                        output.push_str(&self.host);
+                    }
+                }
                 PromptSegment::Cwd => {
                     // Use PWD or current_dir (no subprocess!)
                     let cwd = std::env::var("PWD")
                         .or_else(|_| std::env::current_dir().map(|p| p.display().to_string()))
                         .unwrap_or_else(|_| "~".to_string());
-                    output.push_str(&cwd);
+                    if self.colors_enabled {
+                        output.push_str(&Styled::new(&cwd, DefaultTheme::cwd()).render());
+                    } else {
+                        output.push_str(&cwd);
+                    }
                 }
                 PromptSegment::Git => {
                     // Use cached git status (never blocks)
-                    output.push_str(&self.git_cache.render());
+                    output.push_str(&self.git_cache.render_colored(self.colors_enabled));
                 }
                 PromptSegment::Char => {
                     let is_root = self.user == "root";
-                    output.push(if is_root { '#' } else { '$' });
+                    let ch = if is_root { '#' } else { '$' };
+                    if self.colors_enabled {
+                        let style = if is_root {
+                            DefaultTheme::prompt_root()
+                        } else {
+                            DefaultTheme::prompt_char()
+                        };
+                        output.push_str(&Styled::new(ch.to_string(), style).render());
+                    } else {
+                        output.push(ch);
+                    }
                 }
                 PromptSegment::Custom(name) => {
                     output.push_str(&format!("{{{name}}}"));

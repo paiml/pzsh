@@ -69,18 +69,25 @@ fn main() -> ExitCode {
 
             match pzsh::config::CompiledConfig::from_toml(&content) {
                 Ok(compiled) => {
-                    let output_path = output.unwrap_or_else(|| {
-                        let mut p = path.clone();
-                        p.set_extension("compiled");
-                        p
-                    });
+                    // Generate shell init code
+                    let shell_code = pzsh::shell::generate_init(compiled.shell_type, compiled);
 
-                    // For now, just print success
-                    println!("✓ Compiled configuration");
-                    println!("  Aliases: {}", compiled.aliases.len());
-                    println!("  Env vars: {}", compiled.env.len());
-                    println!("  Plugins: {}", compiled.plugins_enabled.len());
-                    println!("  Output: {}", output_path.display());
+                    if let Some(output_path) = output {
+                        // Write to file
+                        let output_path = expand_path(&output_path);
+                        match fs::write(&output_path, &shell_code) {
+                            Ok(()) => {
+                                eprintln!("✓ Compiled to {}", output_path.display());
+                            }
+                            Err(e) => {
+                                eprintln!("Error writing {}: {}", output_path.display(), e);
+                                return ExitCode::FAILURE;
+                            }
+                        }
+                    } else {
+                        // Print to stdout for eval
+                        print!("{shell_code}");
+                    }
 
                     ExitCode::SUCCESS
                 }

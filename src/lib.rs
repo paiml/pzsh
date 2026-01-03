@@ -4,10 +4,16 @@
 //! This is not a goal—it is a hard constraint.
 
 pub mod cli;
+pub mod color;
+pub mod completion;
 pub mod config;
 pub mod executor;
 pub mod parser;
+pub mod plugin;
 pub mod prompt;
+pub mod shell;
+pub mod theme;
+pub mod zsh;
 
 use std::time::Duration;
 
@@ -58,6 +64,7 @@ pub enum ShellType {
 
 /// Main pzsh shell instance
 #[derive(Debug)]
+#[allow(dead_code)] // Fields are used for future shell operations
 pub struct Pzsh {
     config: config::CompiledConfig,
     parser: parser::Parser,

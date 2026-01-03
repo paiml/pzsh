@@ -73,6 +73,8 @@ pub struct PromptSection {
     pub git_async: bool,
     #[serde(default = "default_git_cache_ms")]
     pub git_cache_ms: u64,
+    #[serde(default = "default_true")]
+    pub colors: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -144,6 +146,8 @@ pub struct CompiledConfig {
     pub prompt_format: String,
     pub git_async: bool,
     pub git_cache_ms: u64,
+    /// Enable ANSI colors in prompt
+    pub colors_enabled: bool,
     /// O(1) alias lookup via perfect hash
     pub aliases: AHashMap<String, String>,
     /// O(1) environment lookup
@@ -162,6 +166,7 @@ impl Default for CompiledConfig {
             prompt_format: default_prompt_format(),
             git_async: true,
             git_cache_ms: 1000,
+            colors_enabled: true,
             aliases: AHashMap::new(),
             env: AHashMap::new(),
             plugins_enabled: Vec::new(),
@@ -199,6 +204,7 @@ impl CompiledConfig {
             prompt_format: source.prompt.format,
             git_async: source.prompt.git_async,
             git_cache_ms: source.prompt.git_cache_ms,
+            colors_enabled: source.prompt.colors,
             aliases: source.aliases,
             env: source.env,
             plugins_enabled: source.plugins.enabled,
