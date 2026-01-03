@@ -1,0 +1,82 @@
+[package]
+name = "pzsh"
+version = "0.1.0"
+edition = "2024"
+authors = ["paiml"]
+description = "Performance-first shell framework with sub-10ms startup"
+license = "MIT"
+repository = "https://github.com/paiml/pzsh"
+keywords = ["shell", "zsh", "bash", "performance", "cli"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Performance
+lru = "0.12"
+ahash = { version = "0.8", features = ["serde"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Time measurement
+quanta = "0.12"
+
+# System
+dirs = "5"
+hostname = "0.4"
+
+[dev-dependencies]
+# Testing
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1"
+test-case = "3"
+
+[[bench]]
+name = "startup"
+harness = false
+
+[[example]]
+name = "basic_config"
+path = "examples/basic_config.rs"
+
+[[example]]
+name = "benchmark"
+path = "examples/benchmark.rs"
+
+[[example]]
+name = "lint_config"
+path = "examples/lint_config.rs"
+
+[[example]]
+name = "parser"
+path = "examples/parser.rs"
+
+[[example]]
+name = "prompt"
+path = "examples/prompt.rs"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+inherits = "release"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+cast_possible_truncation = "allow"
+missing_const_for_fn = "allow"

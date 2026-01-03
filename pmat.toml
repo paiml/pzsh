@@ -1,0 +1,35 @@
+[project]
+name = "pzsh"
+version = "0.1.0"
+description = "Performance-first shell framework with sub-10ms startup"
+
+[compliance]
+# Toyota Way compliance
+tps_principles = true
+# Popperian falsification
+falsification_checklist = true
+# Mutation testing requirement
+mutation_threshold = 95
+
+[testing]
+unit_coverage_threshold = 90
+integration_coverage_threshold = 80
+mutation_score_threshold = 95
+property_tests = true
+
+[performance]
+startup_budget_ms = 10
+prompt_budget_ms = 2
+parser_budget_ms = 2
+executor_budget_ms = 2
+
+[quality]
+clippy_deny = true
+unsafe_forbidden = true
+doc_coverage = 100
+no_todos_in_main = true
+
+[ci]
+benchmark_on_commit = true
+fail_on_regression = true
+regression_threshold_percent = 5

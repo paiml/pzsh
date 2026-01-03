@@ -1,0 +1,14 @@
+[book]
+authors = ["paiml"]
+language = "en"
+multilingual = false
+src = "src"
+title = "The pzsh Book"
+description = "Performance-first shell framework with sub-10ms startup"
+
+[build]
+build-dir = "build"
+
+[output.html]
+git-repository-url = "https://github.com/paiml/pzsh"
+edit-url-template = "https://github.com/paiml/pzsh/edit/main/book/{path}"
