@@ -53,6 +53,9 @@ impl ShellIntegration {
         // Completion setup
         output.push_str(&self.generate_completion_setup());
 
+        // Shell options (autocd, etc.)
+        output.push_str(&self.generate_shell_options());
+
         // History configuration
         output.push_str(&self.generate_history_config());
 
@@ -303,6 +306,39 @@ bind 'set completion-ignore-case on'
 
 "
         .to_string()
+    }
+
+    fn generate_shell_options(&self) -> String {
+        match self.shell_type {
+            ShellType::Zsh => r#"# Shell options (oh-my-zsh defaults)
+setopt AUTO_CD              # cd by typing directory name
+setopt AUTO_PUSHD           # Push dirs to stack automatically
+setopt PUSHD_IGNORE_DUPS    # No duplicates in dir stack
+setopt PUSHD_SILENT         # Don't print dir stack
+setopt CORRECT              # Command spell correction
+setopt CDABLE_VARS          # cd to named directories
+setopt EXTENDED_GLOB        # Extended globbing (#, ~, ^)
+setopt NO_CASE_GLOB         # Case-insensitive globbing
+setopt NUMERIC_GLOB_SORT    # Sort numerically when globbing
+setopt NO_BEEP              # No beep on error
+setopt INTERACTIVE_COMMENTS # Allow comments in interactive shell
+setopt MULTIOS              # Multiple redirections
+setopt NO_FLOW_CONTROL      # Disable Ctrl-S/Ctrl-Q flow control
+
+"#
+            .to_string(),
+            ShellType::Bash => r#"# Shell options
+shopt -s autocd             # cd by typing directory name
+shopt -s cdspell            # Autocorrect cd typos
+shopt -s dirspell           # Autocorrect directory typos
+shopt -s globstar           # ** recursive glob
+shopt -s nocaseglob         # Case-insensitive globbing
+shopt -s dotglob            # Include dotfiles in globbing
+shopt -s extglob            # Extended pattern matching
+
+"#
+            .to_string(),
+        }
     }
 
     fn generate_history_config(&self) -> String {
