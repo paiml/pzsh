@@ -651,6 +651,86 @@ mod tests {
         assert!(output.contains("shopt -s histappend"));
     }
 
+    #[test]
+    fn test_bash_init_sets_keybindings() {
+        let config = test_config();
+        let output = generate_init(ShellType::Bash, config);
+
+        // History search
+        assert!(output.contains("history-search-backward"));
+        assert!(output.contains("history-search-forward"));
+        assert!(output.contains("reverse-search-history"));
+        // Word navigation
+        assert!(output.contains("forward-word"));
+        assert!(output.contains("backward-word"));
+        // Line navigation
+        assert!(output.contains("beginning-of-line"));
+        assert!(output.contains("end-of-line"));
+        // Editing
+        assert!(output.contains("delete-char"));
+        assert!(output.contains("backward-kill-word"));
+        assert!(output.contains("kill-line"));
+        assert!(output.contains("yank"));
+    }
+
+    #[test]
+    fn test_bash_init_configures_completion() {
+        let config = test_config();
+        let output = generate_init(ShellType::Bash, config);
+
+        // Completion system loading
+        assert!(output.contains("bash_completion") || output.contains("bash-completion"));
+        // Completion settings
+        assert!(output.contains("completion-ignore-case"));
+        assert!(output.contains("completion-map-case"));
+        assert!(output.contains("show-all-if-ambiguous"));
+        // Colored completions
+        assert!(output.contains("colored-stats"));
+        assert!(output.contains("colored-completion-prefix"));
+        // Menu completion
+        assert!(output.contains("menu-complete"));
+    }
+
+    #[test]
+    fn test_bash_init_configures_shell_options() {
+        let config = test_config();
+        let output = generate_init(ShellType::Bash, config);
+
+        assert!(output.contains("shopt -s autocd"));
+        assert!(output.contains("shopt -s cdspell"));
+        assert!(output.contains("shopt -s globstar"));
+        assert!(output.contains("shopt -s nocaseglob"));
+        assert!(output.contains("shopt -s extglob"));
+    }
+
+    #[test]
+    fn test_bash_init_no_colors() {
+        let mut config = test_config();
+        config.colors_enabled = false;
+        let output = generate_init(ShellType::Bash, config);
+
+        assert!(output.contains("PS1='\\u@\\h \\w \\$ '"));
+        assert!(!output.contains("\\033[32m"));
+    }
+
+    #[test]
+    fn test_bash_init_includes_plugin_aliases() {
+        let config = test_config();
+        let output = generate_init(ShellType::Bash, config);
+
+        // Git plugin should add 'g' alias
+        assert!(output.contains("alias g='git'"));
+    }
+
+    #[test]
+    fn test_bash_completion_homebrew_support() {
+        let config = test_config();
+        let output = generate_init(ShellType::Bash, config);
+
+        // Should check for homebrew completions on macOS
+        assert!(output.contains("brew --prefix") || output.contains("Homebrew"));
+    }
+
     // ==================== ESCAPE HANDLING TESTS ====================
 
     #[test]
