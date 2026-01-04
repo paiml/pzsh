@@ -176,7 +176,7 @@ fn main() -> ExitCode {
                     println!("\nNext steps:");
                     println!("  1. Edit ~/.pzshrc to add your aliases and env vars");
                     println!("  2. Run `pzsh compile` to compile the configuration");
-                    println!("  3. Add `source ~/.pzsh/init.zsh` to your ~/.zshrc");
+                    println!("  3. Add `eval \"$(pzsh compile)\"` to your ~/.zshrc");
                     ExitCode::SUCCESS
                 }
                 Err(e) => {
