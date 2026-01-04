@@ -3,70 +3,106 @@
 //! Run with: cargo run --example plugin
 
 use pzsh::ShellType;
-use pzsh::plugin::{DockerPlugin, GitPlugin, Plugin, PluginInfo, PluginManager};
+use pzsh::plugin::{
+    AwsPlugin, DockerPlugin, GitPlugin, GolangPlugin, KubectlPlugin, NpmPlugin, Plugin,
+    PluginInfo, PluginManager, PythonPlugin, RustPlugin, TerraformPlugin,
+};
 
 fn main() {
     println!("=== pzsh Plugin System ===\n");
     println!("oh-my-zsh compatible plugins with O(1) loading\n");
 
-    // Git plugin
-    println!("=== Git Plugin ===");
-    let mut git = GitPlugin::new();
-    let _ = git.init();
-    let info = git.info();
-    println!("Name: {}", info.name);
-    println!("Description: {}", info.description);
-    println!("Version: {}", info.version);
-    println!("Aliases ({}):", git.aliases().len());
-    for (alias, expansion) in git.aliases().iter().take(10) {
-        println!("  {} -> {}", alias, expansion);
+    // Show all available plugins
+    println!("=== Available Plugins (9) ===\n");
+
+    let plugins: Vec<Box<dyn Plugin>> = vec![
+        Box::new(GitPlugin::new()),
+        Box::new(DockerPlugin::new()),
+        Box::new(KubectlPlugin::new()),
+        Box::new(NpmPlugin::new()),
+        Box::new(PythonPlugin::new()),
+        Box::new(GolangPlugin::new()),
+        Box::new(RustPlugin::new()),
+        Box::new(TerraformPlugin::new()),
+        Box::new(AwsPlugin::new()),
+    ];
+
+    for plugin in &plugins {
+        let info = plugin.info();
+        let aliases = plugin.aliases();
+        println!(
+            "  {:12} - {} ({} aliases)",
+            info.name,
+            info.description,
+            aliases.len()
+        );
     }
-    println!("  ... and {} more", git.aliases().len().saturating_sub(10));
     println!();
 
-    // Docker plugin
-    println!("=== Docker Plugin ===");
-    let mut docker = DockerPlugin::new();
-    let _ = docker.init();
-    let info = docker.info();
-    println!("Name: {}", info.name);
-    println!("Description: {}", info.description);
-    println!("Aliases ({}):", docker.aliases().len());
-    for (alias, expansion) in docker.aliases() {
-        println!("  {} -> {}", alias, expansion);
-    }
-    println!();
-
-    // Plugin manager
+    // Plugin manager - load all plugins
     println!("=== Plugin Manager ===");
     let mut manager = PluginManager::new();
 
-    // Load plugins
-    match manager.load("git") {
-        Ok(duration) => println!("Loaded git plugin in {:?}", duration),
-        Err(e) => println!("Failed to load git: {}", e),
+    let plugin_names = [
+        "git",
+        "docker",
+        "kubectl",
+        "npm",
+        "python",
+        "golang",
+        "rust",
+        "terraform",
+        "aws",
+    ];
+
+    let mut total_time = std::time::Duration::ZERO;
+    for name in plugin_names {
+        match manager.load(name) {
+            Ok(duration) => {
+                total_time += duration;
+                println!("  ✓ Loaded {} in {:?}", name, duration);
+            }
+            Err(e) => println!("  ✗ Failed to load {}: {}", name, e),
+        }
     }
-    match manager.load("docker") {
-        Ok(duration) => println!("Loaded docker plugin in {:?}", duration),
-        Err(e) => println!("Failed to load docker: {}", e),
-    }
+    println!("\nTotal load time: {:?}", total_time);
+    println!("Loaded plugins: {}", manager.loaded_count());
     println!();
 
     // All aliases from loaded plugins
-    println!("All plugin aliases:");
+    println!("=== Combined Aliases ===");
     let all_aliases = manager.all_aliases();
-    for (name, expansion) in all_aliases.iter().take(15) {
-        println!("  {} -> {}", name, expansion);
+    println!("Total aliases: {}", all_aliases.len());
+
+    // Show sample aliases by category
+    println!("\nSample aliases:");
+    let samples = [
+        ("gs", "git status"),
+        ("dps", "docker ps"),
+        ("k", "kubectl"),
+        ("ni", "npm install"),
+        ("py", "python3"),
+        ("gob", "go build"),
+        ("cb", "cargo build"),
+        ("tf", "terraform"),
+        ("awsw", "aws sts get-caller-identity"),
+    ];
+    for (alias, expected) in samples {
+        if let Some(expansion) = all_aliases.get(alias) {
+            println!("  {} -> {}", alias, expansion);
+        } else {
+            println!("  {} -> (expected: {})", alias, expected);
+        }
     }
-    println!("  ... total: {} aliases", all_aliases.len());
     println!();
 
     // Shell initialization code
     println!("=== Shell Init Code (ZSH) ===");
     let init_code = manager.shell_init(ShellType::Zsh);
-    for line in init_code.lines() {
+    for line in init_code.lines().take(10) {
         println!("  {}", line);
     }
+    println!("  ...");
     println!();
 
     // Plugin info builder
@@ -81,11 +117,5 @@ fn main() {
     println!("Dependencies: {:?}", custom_info.dependencies);
     println!();
 
-    // Available plugins
-    println!("=== Available Plugins ===");
-    println!("Built-in plugins:");
-    println!("  - git: Git aliases and integration");
-    println!("  - docker: Docker aliases");
-    println!();
     println!("Plugin load time: O(1) - no external scripts");
 }

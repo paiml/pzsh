@@ -1,6 +1,6 @@
 [package]
 name = "pzsh"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 authors = ["paiml"]
 description = "Performance-first shell framework with sub-10ms startup"

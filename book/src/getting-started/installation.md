@@ -23,15 +23,21 @@ pzsh status
 
 Expected output:
 ```
-pzsh v0.1.0
+pzsh v0.2.1
 ────────────────────────────
-Startup: 0.03ms (budget: 10ms) ✓
+Startup: 0.01ms (budget: 10ms) ✓
 ```
 
 ## Initialize Configuration
 
+For zsh (default):
 ```bash
-pzsh init --shell zsh
+pzsh init
+```
+
+For bash:
+```bash
+pzsh init --shell bash
 ```
 
 This creates `~/.pzshrc` with a minimal configuration.
@@ -41,13 +47,26 @@ This creates `~/.pzshrc` with a minimal configuration.
 Add to your `~/.zshrc`:
 
 ```bash
-# pzsh initialization
-eval "$(pzsh init)"
+# pzsh shell framework
+eval "$(pzsh compile)"
 ```
 
 Or for bash, add to `~/.bashrc`:
 
 ```bash
-# pzsh initialization
-eval "$(pzsh init)"
+# pzsh shell framework
+eval "$(pzsh compile)"
 ```
+
+## Shell Support
+
+pzsh supports both **zsh** and **bash** with near-complete feature parity:
+
+| Feature | zsh | bash |
+|---------|-----|------|
+| Plugins (9) | Full | Full |
+| Keybindings | 18 | 22 |
+| Completion | oh-my-zsh style | oh-my-zsh style |
+| Auto-suggestions | Yes | No (zsh-only) |
+| Syntax highlighting | Yes | No (zsh-only) |
+| Startup time | <10ms | <10ms |

@@ -1,7 +1,6 @@
 [book]
 authors = ["paiml"]
 language = "en"
-multilingual = false
 src = "src"
 title = "The pzsh Book"
 description = "Performance-first shell framework with sub-10ms startup"
