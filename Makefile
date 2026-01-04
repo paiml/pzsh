@@ -2,7 +2,7 @@
 # Performance-first shell framework with sub-10ms startup
 # Following Toyota Way principles for fast feedback loops
 
-.PHONY: all build test coverage coverage-quick coverage-full coverage-ci coverage-open coverage-clean bench lint fmt clean help
+.PHONY: all build test coverage coverage-quick coverage-full coverage-ci coverage-open coverage-clean bench lint fmt clean help check quick-check hook-install integration
 
 # Default target
 all: fmt lint test
@@ -112,6 +112,28 @@ examples: ## Run all examples
 	cargo run --example lint_config
 	cargo run --example parser
 	cargo run --example prompt
+
+# Quick check (pre-commit, <5s)
+check: quick-check ## Alias for quick-check
+
+quick-check: ## Fast pre-commit checks (<5s)
+	@echo "⚡ Quick check..."
+	@cargo fmt --check --quiet
+	@cargo test --quiet --lib tests::test_startup_under_10ms 2>/dev/null
+	@cargo build --release --quiet
+	@echo "✓ All checks passed"
+
+# Integration tests
+integration: ## Run integration tests
+	cargo test --test integration
+
+# Pre-commit hook
+hook-install: ## Install pre-commit hook
+	@ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
+	@echo "✓ Pre-commit hook installed"
+
+hook-run: ## Run pre-commit hook manually
+	@./scripts/pre-commit
 
 # Help
 help: ## Show this help

@@ -936,7 +936,11 @@ mod tests {
         let predictions = completer.predict(&ctx);
 
         assert!(!predictions.is_empty());
-        assert!(predictions.iter().any(|p| p.text == "status" || p.text == "stash"));
+        assert!(
+            predictions
+                .iter()
+                .any(|p| p.text == "status" || p.text == "stash")
+        );
     }
 
     #[test]

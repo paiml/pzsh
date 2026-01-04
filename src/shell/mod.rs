@@ -3,6 +3,9 @@
 //! Generates working shell initialization code for zsh and bash.
 //! All code is designed to be sourced directly: `eval "$(pzsh init zsh)"`
 
+// Allow raw string hashes for shell code readability
+#![allow(clippy::needless_raw_string_hashes)]
+
 use crate::ShellType;
 use crate::config::CompiledConfig;
 use crate::plugin::PluginManager;

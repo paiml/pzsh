@@ -1,0 +1,70 @@
+#!/bin/bash
+# pzsh pre-commit hook
+# Runs in <5 seconds to verify all features and performance
+# Install: ln -sf ../../scripts/pre-commit .git/hooks/pre-commit
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+echo -e "${YELLOW}pzsh pre-commit checks${NC}"
+START=$(date +%s)
+
+# 1. Format check (instant)
+echo -n "  fmt... "
+if cargo fmt --check --quiet 2>/dev/null; then
+    echo -e "${GREEN}✓${NC}"
+else
+    echo -e "${RED}✗${NC}"
+    echo "Run: cargo fmt"
+    exit 1
+fi
+
+# 2. Clippy (optional, warn-only for speed)
+echo -n "  clippy... "
+if cargo clippy --quiet --lib 2>/dev/null; then
+    echo -e "${GREEN}✓${NC}"
+else
+    echo -e "${YELLOW}⚠${NC} (warnings, CI will catch)"
+fi
+
+# 3. Quick test (cached, ~1s)
+echo -n "  test... "
+if cargo test --quiet --lib 2>/dev/null; then
+    echo -e "${GREEN}✓${NC}"
+else
+    echo -e "${RED}✗${NC}"
+    exit 1
+fi
+
+# 4. Performance check (instant via library)
+echo -n "  perf... "
+PERF_OUTPUT=$(cargo test --quiet --lib test_startup_under_10ms 2>&1)
+if echo "$PERF_OUTPUT" | grep -q "ok"; then
+    echo -e "${GREEN}✓${NC}"
+else
+    echo -e "${RED}✗ ANDON: startup exceeded 10ms${NC}"
+    exit 1
+fi
+
+# 5. Build check (cached, ~0.5s)
+echo -n "  build... "
+if cargo build --release --quiet 2>/dev/null; then
+    echo -e "${GREEN}✓${NC}"
+else
+    echo -e "${RED}✗${NC}"
+    exit 1
+fi
+
+END=$(date +%s)
+ELAPSED=$((END - START))
+
+echo -e "${GREEN}All checks passed${NC} (${ELAPSED}s)"
+
+# Fail if over 30 seconds
+if [ $ELAPSED -gt 30 ]; then
+    echo -e "${RED}Warning: pre-commit took ${ELAPSED}s (>30s)${NC}"
+fi

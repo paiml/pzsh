@@ -306,8 +306,14 @@ impl Plugin for KubectlPlugin {
         aliases.insert("kex".to_string(), "kubectl exec -it".to_string());
         aliases.insert("ka".to_string(), "kubectl apply -f".to_string());
         aliases.insert("kdel".to_string(), "kubectl delete".to_string());
-        aliases.insert("kctx".to_string(), "kubectl config current-context".to_string());
-        aliases.insert("kns".to_string(), "kubectl config set-context --current --namespace".to_string());
+        aliases.insert(
+            "kctx".to_string(),
+            "kubectl config current-context".to_string(),
+        );
+        aliases.insert(
+            "kns".to_string(),
+            "kubectl config set-context --current --namespace".to_string(),
+        );
         aliases
     }
 }
@@ -419,7 +425,10 @@ impl Plugin for PythonPlugin {
         aliases.insert("py".to_string(), "python3".to_string());
         aliases.insert("py2".to_string(), "python2".to_string());
         aliases.insert("pip".to_string(), "pip3".to_string());
-        aliases.insert("pir".to_string(), "pip install -r requirements.txt".to_string());
+        aliases.insert(
+            "pir".to_string(),
+            "pip install -r requirements.txt".to_string(),
+        );
         aliases.insert("pie".to_string(), "pip install -e .".to_string());
         aliases.insert("piu".to_string(), "pip install --upgrade".to_string());
         aliases.insert("pif".to_string(), "pip freeze".to_string());
@@ -432,7 +441,10 @@ impl Plugin for PythonPlugin {
         aliases.insert("ptx".to_string(), "pytest -x".to_string());
         // uv (fast pip alternative)
         aliases.insert("uvi".to_string(), "uv pip install".to_string());
-        aliases.insert("uvr".to_string(), "uv pip install -r requirements.txt".to_string());
+        aliases.insert(
+            "uvr".to_string(),
+            "uv pip install -r requirements.txt".to_string(),
+        );
         aliases
     }
 }
@@ -587,7 +599,10 @@ impl Plugin for TerraformPlugin {
         aliases.insert("tfi".to_string(), "terraform init".to_string());
         aliases.insert("tfp".to_string(), "terraform plan".to_string());
         aliases.insert("tfa".to_string(), "terraform apply".to_string());
-        aliases.insert("tfaa".to_string(), "terraform apply -auto-approve".to_string());
+        aliases.insert(
+            "tfaa".to_string(),
+            "terraform apply -auto-approve".to_string(),
+        );
         aliases.insert("tfd".to_string(), "terraform destroy".to_string());
         aliases.insert("tff".to_string(), "terraform fmt".to_string());
         aliases.insert("tfv".to_string(), "terraform validate".to_string());
@@ -641,21 +656,33 @@ impl Plugin for AwsPlugin {
 
     fn aliases(&self) -> AHashMap<String, String> {
         let mut aliases = AHashMap::new();
-        aliases.insert("awsw".to_string(), "aws sts get-caller-identity".to_string());
+        aliases.insert(
+            "awsw".to_string(),
+            "aws sts get-caller-identity".to_string(),
+        );
         aliases.insert("awsl".to_string(), "aws configure list".to_string());
-        aliases.insert("awsp".to_string(), "aws configure list-profiles".to_string());
+        aliases.insert(
+            "awsp".to_string(),
+            "aws configure list-profiles".to_string(),
+        );
         // S3
         aliases.insert("s3ls".to_string(), "aws s3 ls".to_string());
         aliases.insert("s3cp".to_string(), "aws s3 cp".to_string());
         aliases.insert("s3sync".to_string(), "aws s3 sync".to_string());
         // EC2
-        aliases.insert("ec2ls".to_string(), "aws ec2 describe-instances".to_string());
+        aliases.insert(
+            "ec2ls".to_string(),
+            "aws ec2 describe-instances".to_string(),
+        );
         // ECS
         aliases.insert("ecsls".to_string(), "aws ecs list-clusters".to_string());
         // Lambda
         aliases.insert("lamls".to_string(), "aws lambda list-functions".to_string());
         // SSM
-        aliases.insert("ssm".to_string(), "aws ssm start-session --target".to_string());
+        aliases.insert(
+            "ssm".to_string(),
+            "aws ssm start-session --target".to_string(),
+        );
         aliases
     }
 }
@@ -2015,14 +2042,14 @@ mod tests {
         let aliases = manager.all_aliases();
 
         // Check aliases from each plugin
-        assert!(aliases.contains_key("gs"));    // git
-        assert!(aliases.contains_key("dps"));   // docker
-        assert!(aliases.contains_key("k"));     // kubectl
-        assert!(aliases.contains_key("ni"));    // npm
-        assert!(aliases.contains_key("py"));    // python
-        assert!(aliases.contains_key("gob"));   // golang
-        assert!(aliases.contains_key("cb"));    // rust (c conflicts)
-        assert!(aliases.contains_key("tf"));    // terraform
+        assert!(aliases.contains_key("gs")); // git
+        assert!(aliases.contains_key("dps")); // docker
+        assert!(aliases.contains_key("k")); // kubectl
+        assert!(aliases.contains_key("ni")); // npm
+        assert!(aliases.contains_key("py")); // python
+        assert!(aliases.contains_key("gob")); // golang
+        assert!(aliases.contains_key("cb")); // rust (c conflicts)
+        assert!(aliases.contains_key("tf")); // terraform
         assert!(aliases.contains_key("awsw")); // aws
     }
 

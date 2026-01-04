@@ -4,8 +4,8 @@
 
 use pzsh::ShellType;
 use pzsh::plugin::{
-    AwsPlugin, DockerPlugin, GitPlugin, GolangPlugin, KubectlPlugin, NpmPlugin, Plugin,
-    PluginInfo, PluginManager, PythonPlugin, RustPlugin, TerraformPlugin,
+    AwsPlugin, DockerPlugin, GitPlugin, GolangPlugin, KubectlPlugin, NpmPlugin, Plugin, PluginInfo,
+    PluginManager, PythonPlugin, RustPlugin, TerraformPlugin,
 };
 
 fn main() {
