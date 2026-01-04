@@ -292,20 +292,56 @@ zstyle ':completion:*' cache-path "${ZDOTDIR:-$HOME}/.zcompcache"
         output
     }
 
-    #[allow(clippy::unused_self)]
     fn generate_bash_completion(&self) -> String {
-        r"# Completion system
+        let colors_enabled = self.config.colors_enabled;
+
+        let mut output = String::from(
+            r#"# Completion system - oh-my-zsh compatible
 if [[ -f /etc/bash_completion ]]; then
     . /etc/bash_completion
 elif [[ -f /usr/share/bash-completion/bash_completion ]]; then
     . /usr/share/bash-completion/bash_completion
+elif [[ -f /usr/local/etc/bash_completion ]]; then
+    . /usr/local/etc/bash_completion
 fi
 
-# Case-insensitive completion
-bind 'set completion-ignore-case on'
+# Homebrew completions (macOS)
+if type brew &>/dev/null && [[ -f "$(brew --prefix)/etc/bash_completion" ]]; then
+    . "$(brew --prefix)/etc/bash_completion"
+fi
 
-"
-        .to_string()
+# Completion settings (oh-my-zsh style)
+bind 'set completion-ignore-case on'           # Case-insensitive
+bind 'set completion-map-case on'              # Treat - and _ as equivalent
+bind 'set show-all-if-ambiguous on'            # Show completions on first tab
+bind 'set show-all-if-unmodified on'           # Show completions if no partial completion
+bind 'set mark-symlinked-directories on'       # Add trailing slash to symlinked dirs
+bind 'set completion-prefix-display-length 3'  # Show common prefix length
+
+"#,
+        );
+
+        if colors_enabled {
+            output.push_str(
+                r#"# Colored completions
+bind 'set colored-stats on'                    # Color files by type
+bind 'set colored-completion-prefix on'        # Color common prefix
+bind 'set visible-stats on'                    # Show file type indicators
+
+"#,
+            );
+        }
+
+        output.push_str(
+            r#"# Menu completion (like zsh)
+bind 'set menu-complete-display-prefix on'
+bind 'TAB:menu-complete'                       # Tab cycles through completions
+bind '"\e[Z": menu-complete-backward'          # Shift-Tab cycles backward
+
+"#,
+        );
+
+        output
     }
 
     fn generate_shell_options(&self) -> String {
@@ -412,9 +448,38 @@ bindkey '^Y' yank                 # Ctrl+Y
 "
             .to_string(),
             ShellType::Bash => r#"# Key bindings
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
+# History search with up/down arrows (oh-my-zsh style)
+bind '"\e[A": history-search-backward'    # Up arrow
+bind '"\e[B": history-search-forward'     # Down arrow
+bind '"\eOA": history-search-backward'    # Up arrow (alternate)
+bind '"\eOB": history-search-forward'     # Down arrow (alternate)
+
+# Search
 bind '"\C-r": reverse-search-history'
+bind '"\C-s": forward-search-history'
+bind '"\C-p": history-search-backward'    # Ctrl-P
+bind '"\C-n": history-search-forward'     # Ctrl-N
+
+# Word navigation
+bind '"\e[1;5C": forward-word'            # Ctrl+Right
+bind '"\e[1;5D": backward-word'           # Ctrl+Left
+bind '"\ef": forward-word'                # Alt+f
+bind '"\eb": backward-word'               # Alt+b
+
+# Line navigation
+bind '"\e[H": beginning-of-line'          # Home
+bind '"\e[F": end-of-line'                # End
+bind '"\C-a": beginning-of-line'          # Ctrl+A
+bind '"\C-e": end-of-line'                # Ctrl+E
+
+# Editing
+bind '"\e[3~": delete-char'               # Delete
+bind '"\C-d": delete-char'                # Ctrl+D
+bind '"\C-h": backward-delete-char'       # Ctrl+H (backspace)
+bind '"\C-w": backward-kill-word'         # Ctrl+W
+bind '"\C-u": unix-line-discard'          # Ctrl+U
+bind '"\C-k": kill-line'                  # Ctrl+K
+bind '"\C-y": yank'                       # Ctrl+Y
 
 "#
             .to_string(),

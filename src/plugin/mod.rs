@@ -255,6 +255,411 @@ impl Plugin for DockerPlugin {
     }
 }
 
+/// Built-in kubectl plugin
+#[derive(Debug, Clone)]
+pub struct KubectlPlugin {
+    enabled: bool,
+}
+
+impl KubectlPlugin {
+    /// Create kubectl plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for KubectlPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for KubectlPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("kubectl")
+            .with_description("Kubernetes kubectl aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("k".to_string(), "kubectl".to_string());
+        aliases.insert("kgp".to_string(), "kubectl get pods".to_string());
+        aliases.insert("kgs".to_string(), "kubectl get services".to_string());
+        aliases.insert("kgd".to_string(), "kubectl get deployments".to_string());
+        aliases.insert("kgn".to_string(), "kubectl get nodes".to_string());
+        aliases.insert("kga".to_string(), "kubectl get all".to_string());
+        aliases.insert("kd".to_string(), "kubectl describe".to_string());
+        aliases.insert("kdp".to_string(), "kubectl describe pod".to_string());
+        aliases.insert("kl".to_string(), "kubectl logs".to_string());
+        aliases.insert("klf".to_string(), "kubectl logs -f".to_string());
+        aliases.insert("kex".to_string(), "kubectl exec -it".to_string());
+        aliases.insert("ka".to_string(), "kubectl apply -f".to_string());
+        aliases.insert("kdel".to_string(), "kubectl delete".to_string());
+        aliases.insert("kctx".to_string(), "kubectl config current-context".to_string());
+        aliases.insert("kns".to_string(), "kubectl config set-context --current --namespace".to_string());
+        aliases
+    }
+}
+
+/// Built-in npm/node plugin
+#[derive(Debug, Clone)]
+pub struct NpmPlugin {
+    enabled: bool,
+}
+
+impl NpmPlugin {
+    /// Create npm plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for NpmPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for NpmPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("npm")
+            .with_description("Node.js npm/yarn aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        // npm aliases
+        aliases.insert("ni".to_string(), "npm install".to_string());
+        aliases.insert("nid".to_string(), "npm install --save-dev".to_string());
+        aliases.insert("nig".to_string(), "npm install -g".to_string());
+        aliases.insert("nr".to_string(), "npm run".to_string());
+        aliases.insert("nrs".to_string(), "npm run start".to_string());
+        aliases.insert("nrb".to_string(), "npm run build".to_string());
+        aliases.insert("nrt".to_string(), "npm run test".to_string());
+        aliases.insert("nrd".to_string(), "npm run dev".to_string());
+        aliases.insert("nu".to_string(), "npm update".to_string());
+        aliases.insert("nci".to_string(), "npm ci".to_string());
+        // yarn aliases
+        aliases.insert("y".to_string(), "yarn".to_string());
+        aliases.insert("ya".to_string(), "yarn add".to_string());
+        aliases.insert("yad".to_string(), "yarn add --dev".to_string());
+        aliases.insert("yr".to_string(), "yarn run".to_string());
+        aliases.insert("ys".to_string(), "yarn start".to_string());
+        aliases.insert("yb".to_string(), "yarn build".to_string());
+        aliases.insert("yt".to_string(), "yarn test".to_string());
+        // pnpm aliases
+        aliases.insert("pn".to_string(), "pnpm".to_string());
+        aliases.insert("pni".to_string(), "pnpm install".to_string());
+        aliases.insert("pna".to_string(), "pnpm add".to_string());
+        aliases.insert("pnr".to_string(), "pnpm run".to_string());
+        aliases
+    }
+}
+
+/// Built-in python plugin
+#[derive(Debug, Clone)]
+pub struct PythonPlugin {
+    enabled: bool,
+}
+
+impl PythonPlugin {
+    /// Create python plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for PythonPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for PythonPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("python")
+            .with_description("Python/pip aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("py".to_string(), "python3".to_string());
+        aliases.insert("py2".to_string(), "python2".to_string());
+        aliases.insert("pip".to_string(), "pip3".to_string());
+        aliases.insert("pir".to_string(), "pip install -r requirements.txt".to_string());
+        aliases.insert("pie".to_string(), "pip install -e .".to_string());
+        aliases.insert("piu".to_string(), "pip install --upgrade".to_string());
+        aliases.insert("pif".to_string(), "pip freeze".to_string());
+        aliases.insert("venv".to_string(), "python3 -m venv".to_string());
+        aliases.insert("va".to_string(), "source venv/bin/activate".to_string());
+        aliases.insert("vd".to_string(), "deactivate".to_string());
+        // pytest
+        aliases.insert("pt".to_string(), "pytest".to_string());
+        aliases.insert("ptv".to_string(), "pytest -v".to_string());
+        aliases.insert("ptx".to_string(), "pytest -x".to_string());
+        // uv (fast pip alternative)
+        aliases.insert("uvi".to_string(), "uv pip install".to_string());
+        aliases.insert("uvr".to_string(), "uv pip install -r requirements.txt".to_string());
+        aliases
+    }
+}
+
+/// Built-in golang plugin
+#[derive(Debug, Clone)]
+pub struct GolangPlugin {
+    enabled: bool,
+}
+
+impl GolangPlugin {
+    /// Create golang plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for GolangPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for GolangPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("golang")
+            .with_description("Go language aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("gob".to_string(), "go build".to_string());
+        aliases.insert("gor".to_string(), "go run".to_string());
+        aliases.insert("got".to_string(), "go test".to_string());
+        aliases.insert("gotv".to_string(), "go test -v".to_string());
+        aliases.insert("gof".to_string(), "go fmt ./...".to_string());
+        aliases.insert("gom".to_string(), "go mod".to_string());
+        aliases.insert("gomt".to_string(), "go mod tidy".to_string());
+        aliases.insert("gomi".to_string(), "go mod init".to_string());
+        aliases.insert("gog".to_string(), "go get".to_string());
+        aliases.insert("goi".to_string(), "go install".to_string());
+        aliases.insert("gov".to_string(), "go vet ./...".to_string());
+        aliases
+    }
+}
+
+/// Built-in rust plugin
+#[derive(Debug, Clone)]
+pub struct RustPlugin {
+    enabled: bool,
+}
+
+impl RustPlugin {
+    /// Create rust plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for RustPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RustPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("rust")
+            .with_description("Rust/Cargo aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("c".to_string(), "cargo".to_string());
+        aliases.insert("cb".to_string(), "cargo build".to_string());
+        aliases.insert("cbr".to_string(), "cargo build --release".to_string());
+        aliases.insert("cr".to_string(), "cargo run".to_string());
+        aliases.insert("crr".to_string(), "cargo run --release".to_string());
+        aliases.insert("ct".to_string(), "cargo test".to_string());
+        aliases.insert("cc".to_string(), "cargo check".to_string());
+        aliases.insert("ccl".to_string(), "cargo clippy".to_string());
+        aliases.insert("cf".to_string(), "cargo fmt".to_string());
+        aliases.insert("cu".to_string(), "cargo update".to_string());
+        aliases.insert("ca".to_string(), "cargo add".to_string());
+        aliases.insert("cdo".to_string(), "cargo doc --open".to_string());
+        aliases.insert("cw".to_string(), "cargo watch -x".to_string());
+        aliases
+    }
+}
+
+/// Built-in terraform plugin
+#[derive(Debug, Clone)]
+pub struct TerraformPlugin {
+    enabled: bool,
+}
+
+impl TerraformPlugin {
+    /// Create terraform plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for TerraformPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for TerraformPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("terraform")
+            .with_description("Terraform/OpenTofu aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("tf".to_string(), "terraform".to_string());
+        aliases.insert("tfi".to_string(), "terraform init".to_string());
+        aliases.insert("tfp".to_string(), "terraform plan".to_string());
+        aliases.insert("tfa".to_string(), "terraform apply".to_string());
+        aliases.insert("tfaa".to_string(), "terraform apply -auto-approve".to_string());
+        aliases.insert("tfd".to_string(), "terraform destroy".to_string());
+        aliases.insert("tff".to_string(), "terraform fmt".to_string());
+        aliases.insert("tfv".to_string(), "terraform validate".to_string());
+        aliases.insert("tfo".to_string(), "terraform output".to_string());
+        aliases.insert("tfs".to_string(), "terraform state".to_string());
+        aliases.insert("tfw".to_string(), "terraform workspace".to_string());
+        // OpenTofu aliases
+        aliases.insert("tofu".to_string(), "tofu".to_string());
+        aliases.insert("tofui".to_string(), "tofu init".to_string());
+        aliases.insert("tofup".to_string(), "tofu plan".to_string());
+        aliases.insert("tofua".to_string(), "tofu apply".to_string());
+        aliases
+    }
+}
+
+/// Built-in AWS plugin
+#[derive(Debug, Clone)]
+pub struct AwsPlugin {
+    enabled: bool,
+}
+
+impl AwsPlugin {
+    /// Create AWS plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for AwsPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for AwsPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("aws")
+            .with_description("AWS CLI aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("awsw".to_string(), "aws sts get-caller-identity".to_string());
+        aliases.insert("awsl".to_string(), "aws configure list".to_string());
+        aliases.insert("awsp".to_string(), "aws configure list-profiles".to_string());
+        // S3
+        aliases.insert("s3ls".to_string(), "aws s3 ls".to_string());
+        aliases.insert("s3cp".to_string(), "aws s3 cp".to_string());
+        aliases.insert("s3sync".to_string(), "aws s3 sync".to_string());
+        // EC2
+        aliases.insert("ec2ls".to_string(), "aws ec2 describe-instances".to_string());
+        // ECS
+        aliases.insert("ecsls".to_string(), "aws ecs list-clusters".to_string());
+        // Lambda
+        aliases.insert("lamls".to_string(), "aws lambda list-functions".to_string());
+        // SSM
+        aliases.insert("ssm".to_string(), "aws ssm start-session --target".to_string());
+        aliases
+    }
+}
+
 /// Plugin registry and loader
 pub struct PluginManager {
     /// Registered plugins
@@ -292,6 +697,13 @@ impl PluginManager {
         // Register built-in plugins
         manager.register(GitPlugin::new());
         manager.register(DockerPlugin::new());
+        manager.register(KubectlPlugin::new());
+        manager.register(NpmPlugin::new());
+        manager.register(PythonPlugin::new());
+        manager.register(GolangPlugin::new());
+        manager.register(RustPlugin::new());
+        manager.register(TerraformPlugin::new());
+        manager.register(AwsPlugin::new());
 
         manager
     }
