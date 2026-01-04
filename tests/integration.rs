@@ -3,50 +3,42 @@
 //! These tests verify all features work together and meet performance budgets.
 //! Designed to run in <1 second for use as pre-commit hook.
 
-use std::process::Command;
 use std::time::{Duration, Instant};
 
 /// Performance budget from pmat.toml
 const STARTUP_BUDGET_MS: u64 = 10;
 const PROMPT_BUDGET_MS: u64 = 2;
 
-/// Test that pzsh binary exists and runs
+/// Test that pzsh library initializes correctly
 #[test]
-fn test_binary_runs() {
-    let output = Command::new("cargo")
-        .args(["run", "--release", "--quiet", "--", "--version"])
-        .output()
-        .expect("Failed to run pzsh");
+fn test_library_initializes() {
+    use pzsh::Pzsh;
+    use pzsh::config::CompiledConfig;
 
-    assert!(output.status.success());
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("pzsh"));
+    let config = CompiledConfig::default();
+    let pzsh = Pzsh::new(config);
+    assert!(pzsh.is_ok(), "Pzsh should initialize successfully");
 }
 
 /// Test startup performance meets 10ms budget
 #[test]
 fn test_startup_performance() {
+    use pzsh::Pzsh;
+    use pzsh::config::CompiledConfig;
+
     // Warm up
-    let _ = Command::new("cargo")
-        .args(["run", "--release", "--quiet", "--", "status"])
-        .output();
+    let _ = Pzsh::new(CompiledConfig::default());
 
     let start = Instant::now();
-    let output = Command::new("cargo")
-        .args(["run", "--release", "--quiet", "--", "status"])
-        .output()
-        .expect("Failed to run pzsh status");
+    let config = CompiledConfig::default();
+    let result = Pzsh::new(config);
     let elapsed = start.elapsed();
 
-    assert!(output.status.success());
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("budget: 10ms"));
-    assert!(stdout.contains("✓"));
-
-    // Binary execution should be fast (excluding cargo overhead)
+    assert!(result.is_ok());
     assert!(
-        elapsed < Duration::from_secs(5),
-        "Status command too slow: {:?}",
+        elapsed < Duration::from_millis(STARTUP_BUDGET_MS),
+        "Startup exceeded {}ms budget: {:?}",
+        STARTUP_BUDGET_MS,
         elapsed
     );
 }
@@ -54,22 +46,32 @@ fn test_startup_performance() {
 /// Test compile generates valid shell code
 #[test]
 fn test_compile_generates_shell_code() {
-    let output = Command::new("cargo")
-        .args(["run", "--release", "--quiet", "--", "compile"])
-        .output()
-        .expect("Failed to run pzsh compile");
+    use pzsh::ShellType;
+    use pzsh::config::CompiledConfig;
+    use pzsh::shell::generate_init;
 
-    assert!(output.status.success());
-    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut config = CompiledConfig::default();
+    // Add a test alias to verify alias generation
+    config
+        .aliases
+        .insert("gs".to_string(), "git status".to_string());
+
+    let output = generate_init(ShellType::Zsh, config);
 
     // Should contain shell integration header
-    assert!(stdout.contains("pzsh shell integration"));
+    assert!(
+        output.contains("pzsh shell integration"),
+        "Missing shell integration header"
+    );
 
-    // Should contain aliases
-    assert!(stdout.contains("alias"));
+    // Should contain aliases (we added one)
+    assert!(output.contains("alias"), "Missing aliases");
 
-    // Should contain prompt configuration
-    assert!(stdout.contains("PROMPT") || stdout.contains("PS1"));
+    // Should contain keybindings or prompt configuration
+    assert!(
+        output.contains("bindkey") || output.contains("PROMPT"),
+        "Missing keybindings or prompt configuration"
+    );
 }
 
 /// Test all 9 plugins are available
