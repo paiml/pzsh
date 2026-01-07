@@ -34,7 +34,7 @@ dirs = "6"
 hostname = "0.4"
 
 # Optional ML completions
-aprender = { version = "0.21", optional = true }
+aprender = { version = "0.23", optional = true }
 aprender-shell = { version = "0.2", optional = true }
 
 # Optional SIMD acceleration
