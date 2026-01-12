@@ -139,16 +139,18 @@ checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
 
 [[package]]
 name = "aprender"
-version = "0.15.0"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "918c5660d9274eafc97ebd08befa3506964e8641985a90fe4c217a692bca27d4"
+checksum = "d1140494fee114ac8ae686c8d4e0d859b421c8e082e7a8c4a3f67d0e3f9e2754"
 dependencies = [
  "aes-gcm",
  "argon2",
  "bincode",
  "getrandom 0.2.16",
  "hkdf",
+ "lz4_flex",
  "memmap2",
+ "minijinja",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rayon",
@@ -156,36 +158,18 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "trueno 0.8.9",
+ "trueno",
  "x25519-dalek",
  "zstd",
 ]
 
 [[package]]
-name = "aprender"
-version = "0.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e2ce7eda2fdbba4cf761daed7f0e22df24c54d3b192d0d0328d572f9e15eed2"
-dependencies = [
- "bincode",
- "getrandom 0.2.16",
- "memmap2",
- "rand 0.8.5",
- "rand_chacha 0.3.1",
- "rayon",
- "rmp-serde",
- "serde",
- "serde_json",
- "trueno 0.11.0",
-]
-
-[[package]]
 name = "aprender-shell"
-version = "0.2.2"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0aafdf794ddb143a2a659190d74328df6bebfe13dad59ebf335ea2ae5346eca1"
+checksum = "bd2b86a252f4752ff9506417132d43a3b3076df6a5f963ad5f582c293edcdc48"
 dependencies = [
- "aprender 0.15.0",
+ "aprender",
  "clap",
  "dirs 5.0.1",
  "rpassword",
@@ -803,6 +787,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lz4_flex"
+version = "0.11.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08ab2867e3eeeca90e844d1940eab391c9dc5228783db2ed999acbc0a9ed375a"
+dependencies = [
+ "twox-hash",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -815,6 +808,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "744133e4a0e0a658e1374cf3bf8e415c4052a15a111acd372764c55b4177d490"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "memo-map"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38d1115007560874e373613744c6fba374c17688327a71c1476d1a5954cc857b"
+
+[[package]]
+name = "minijinja"
+version = "2.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12ea9ac0a51fb5112607099560fdf0f90366ab088a2a9e6e8ae176794e9806aa"
+dependencies = [
+ "memo-map",
+ "self_cell",
+ "serde",
 ]
 
 [[package]]
@@ -972,11 +982,11 @@ dependencies = [
 
 [[package]]
 name = "pzsh"
-version = "0.3.1"
+version = "0.3.0"
 dependencies = [
  "ahash",
  "anyhow",
- "aprender 0.21.0",
+ "aprender",
  "aprender-shell",
  "clap",
  "criterion",
@@ -989,7 +999,7 @@ dependencies = [
  "test-case",
  "thiserror 2.0.17",
  "toml",
- "trueno 0.11.0",
+ "trueno",
 ]
 
 [[package]]
@@ -1266,6 +1276,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "self_cell"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b12e76d157a900eb52e81bc6e9f3069344290341720e9178cde2407113ac8d89"
+
+[[package]]
 name = "semver"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1500,15 +1516,6 @@ checksum = "ab16f14aed21ee8bfd8ec22513f7287cd4a91aa92e44edfe2c17ddd004e92607"
 
 [[package]]
 name = "trueno"
-version = "0.8.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7a78cdf00ae8659264f48cf96f9e925357b6258db70ba83d2b60a80fad7e56a"
-dependencies = [
- "thiserror 2.0.17",
-]
-
-[[package]]
-name = "trueno"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a0756605a19a0b79f5dca9b61fba7e428c497abe9ebeac2ef91b39d90b6da91"
@@ -1517,6 +1524,12 @@ dependencies = [
  "num_cpus",
  "thiserror 2.0.17",
 ]
+
+[[package]]
+name = "twox-hash"
+version = "2.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ea3136b675547379c4bd395ca6b938e5ad3c3d20fad76e7fe85f9e0d011419c"
 
 [[package]]
 name = "typenum"
