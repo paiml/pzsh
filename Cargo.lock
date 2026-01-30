@@ -173,12 +173,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "aprender"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3c85734a8105872bdc276d1271b93eadf2954e5d9016d92e7c8421292f0a5f6"
+dependencies = [
+ "bincode",
+ "getrandom 0.2.16",
+ "memmap2",
+ "minijinja",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rayon",
+ "rmp-serde",
+ "serde",
+ "serde_json",
+ "trueno 0.14.3",
+]
+
+[[package]]
 name = "aprender-shell"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd2b86a252f4752ff9506417132d43a3b3076df6a5f963ad5f582c293edcdc48"
 dependencies = [
- "aprender",
+ "aprender 0.24.0",
  "clap",
  "dirs 5.0.1",
  "rpassword",
@@ -1040,11 +1059,11 @@ dependencies = [
 
 [[package]]
 name = "pzsh"
-version = "0.3.3"
+version = "0.3.4"
 dependencies = [
  "ahash",
  "anyhow",
- "aprender",
+ "aprender 0.25.1",
  "aprender-shell",
  "clap",
  "criterion",
