@@ -1,6 +1,6 @@
 [package]
 name = "pzsh"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2024"
 authors = ["paiml"]
 description = "Performance-first shell framework with sub-10ms startup"
@@ -38,7 +38,7 @@ aprender = { version = "0.24", optional = true }
 aprender-shell = { version = "0.3", optional = true }
 
 # Optional SIMD acceleration
-trueno = { version = "0.11", optional = true }
+trueno = { version = "0.14", optional = true }
 
 [features]
 default = []
