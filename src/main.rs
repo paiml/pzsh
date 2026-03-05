@@ -27,7 +27,11 @@ fn read_config(path: &PathBuf) -> Result<String, ExitCode> {
 }
 
 fn pass_fail(passed: bool) -> ExitCode {
-    if passed { ExitCode::SUCCESS } else { ExitCode::FAILURE }
+    if passed {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::FAILURE
+    }
 }
 
 fn cmd_bench(iterations: u32, verbose: bool) -> ExitCode {
@@ -143,7 +147,10 @@ fn cmd_init(shell: &str) -> ExitCode {
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match cli.command {
-        Commands::Bench { iterations, verbose } => cmd_bench(iterations, verbose),
+        Commands::Bench {
+            iterations,
+            verbose,
+        } => cmd_bench(iterations, verbose),
         Commands::Lint { config } => cmd_lint(&config),
         Commands::Compile { config, output } => cmd_compile(&config, output),
         Commands::Fix { config, dry_run } => cmd_fix(&config, dry_run),
