@@ -221,7 +221,7 @@ impl CompiledConfig {
             ));
         }
 
-        // Forbidden: brew --prefix (common slow pattern)
+        // Reject brew --prefix — adds 50-100ms to shell startup
         if value.contains("brew --prefix") {
             return Err(ConfigError::ForbiddenPattern(
                 "brew --prefix is slow; use hardcoded path".to_string(),

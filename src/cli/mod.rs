@@ -262,81 +262,92 @@ impl LintResult {
     }
 }
 
+struct LintRule {
+    pattern: &'static str,
+    skip_comments: bool,
+    severity: LintSeverity,
+    message: &'static str,
+    fix: Option<&'static str>,
+}
+
+const LINT_RULES: &[LintRule] = &[
+    LintRule {
+        pattern: "$(",
+        skip_comments: false,
+        severity: LintSeverity::Error,
+        message: "subprocess call $() not allowed at startup",
+        fix: Some("use pre-resolved path instead"),
+    },
+    LintRule {
+        pattern: "`",
+        skip_comments: true,
+        severity: LintSeverity::Error,
+        message: "backtick substitution not allowed",
+        fix: Some("use pre-resolved value instead"),
+    },
+    LintRule {
+        pattern: "brew --prefix",
+        skip_comments: false,
+        severity: LintSeverity::Error,
+        message: "brew --prefix is slow (50-100ms)",
+        fix: Some("run `brew --prefix <formula>` once and hardcode the path"),
+    },
+    LintRule {
+        pattern: "eval ",
+        skip_comments: true,
+        severity: LintSeverity::Error,
+        message: "eval not allowed for safety",
+        fix: None,
+    },
+    LintRule {
+        pattern: "oh-my-zsh",
+        skip_comments: false,
+        severity: LintSeverity::Error,
+        message: "oh-my-zsh is slow (500-2000ms startup)",
+        fix: Some("remove oh-my-zsh, use pzsh plugins instead"),
+    },
+    LintRule {
+        pattern: "nvm.sh",
+        skip_comments: true,
+        severity: LintSeverity::Warning,
+        message: "NVM adds 200-500ms to startup",
+        fix: Some("use fnm or volta instead, or lazy-load NVM"),
+    },
+    LintRule {
+        pattern: "conda init",
+        skip_comments: false,
+        severity: LintSeverity::Warning,
+        message: "conda init adds 200-400ms to startup",
+        fix: Some("lazy-load conda or use mamba"),
+    },
+    LintRule {
+        pattern: "conda.sh",
+        skip_comments: false,
+        severity: LintSeverity::Warning,
+        message: "conda init adds 200-400ms to startup",
+        fix: Some("lazy-load conda or use mamba"),
+    },
+];
+
 /// Lint configuration content
 pub fn lint_config(content: &str) -> LintResult {
     let mut issues = Vec::new();
 
     for (line_num, line) in content.lines().enumerate() {
-        let line_num = line_num + 1;
+        let is_comment = line.trim_start().starts_with('#');
 
-        // Check for subprocess calls
-        if line.contains("$(") {
-            issues.push(LintIssue {
-                severity: LintSeverity::Error,
-                message: "subprocess call $() not allowed at startup".to_string(),
-                line: Some(line_num),
-                fix: Some("use pre-resolved path instead".to_string()),
-            });
-        }
-
-        // Check for backticks
-        if line.contains('`') && !line.trim_start().starts_with('#') {
-            issues.push(LintIssue {
-                severity: LintSeverity::Error,
-                message: "backtick substitution not allowed".to_string(),
-                line: Some(line_num),
-                fix: Some("use pre-resolved value instead".to_string()),
-            });
-        }
-
-        // Check for brew --prefix
-        if line.contains("brew --prefix") {
-            issues.push(LintIssue {
-                severity: LintSeverity::Error,
-                message: "brew --prefix is slow (50-100ms)".to_string(),
-                line: Some(line_num),
-                fix: Some("run `brew --prefix <formula>` once and hardcode the path".to_string()),
-            });
-        }
-
-        // Check for eval
-        if line.contains("eval ") && !line.trim_start().starts_with('#') {
-            issues.push(LintIssue {
-                severity: LintSeverity::Error,
-                message: "eval not allowed for safety".to_string(),
-                line: Some(line_num),
-                fix: None,
-            });
-        }
-
-        // Check for slow plugin managers
-        if line.contains("oh-my-zsh") || line.contains("source $ZSH/oh-my-zsh.sh") {
-            issues.push(LintIssue {
-                severity: LintSeverity::Error,
-                message: "oh-my-zsh is slow (500-2000ms startup)".to_string(),
-                line: Some(line_num),
-                fix: Some("remove oh-my-zsh, use pzsh plugins instead".to_string()),
-            });
-        }
-
-        // Check for NVM
-        if line.contains("nvm.sh") && !line.trim_start().starts_with('#') {
-            issues.push(LintIssue {
-                severity: LintSeverity::Warning,
-                message: "NVM adds 200-500ms to startup".to_string(),
-                line: Some(line_num),
-                fix: Some("use fnm or volta instead, or lazy-load NVM".to_string()),
-            });
-        }
-
-        // Check for conda init
-        if line.contains("conda init") || line.contains("conda.sh") {
-            issues.push(LintIssue {
-                severity: LintSeverity::Warning,
-                message: "conda init adds 200-400ms to startup".to_string(),
-                line: Some(line_num),
-                fix: Some("lazy-load conda or use mamba".to_string()),
-            });
+        for rule in LINT_RULES {
+            if rule.skip_comments && is_comment {
+                continue;
+            }
+            if line.contains(rule.pattern) {
+                issues.push(LintIssue {
+                    severity: rule.severity,
+                    message: rule.message.to_string(),
+                    line: Some(line_num + 1),
+                    fix: rule.fix.map(String::from),
+                });
+            }
         }
     }
 
