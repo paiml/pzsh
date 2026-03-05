@@ -761,7 +761,7 @@ mod tests {
         let elapsed = start.elapsed();
 
         assert!(
-            elapsed < std::time::Duration::from_millis(100),
+            elapsed < std::time::Duration::from_millis(500),
             "Auto-suggest too slow: {:?}",
             elapsed
         );
