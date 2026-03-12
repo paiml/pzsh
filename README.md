@@ -263,9 +263,8 @@ cargo run --example parser
 
 ## 🔗 Built With
 
-- [bashrs](https://crates.io/crates/bashrs) v6.48 - Rust↔Shell transpiler
-- [aprender-shell](https://crates.io/crates/aprender-shell) v0.2 - ML completions
-- [trueno](https://crates.io/crates/trueno) v0.11 - SIMD acceleration
+- [aprender-shell](https://crates.io/crates/aprender-shell) v0.3 - ML completions
+- [trueno](https://crates.io/crates/trueno) v0.15 - SIMD acceleration
 
 ## 📚 Toyota Way
 
