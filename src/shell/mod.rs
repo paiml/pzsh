@@ -91,6 +91,10 @@ impl ShellIntegration {
         let mut output = String::from("# Environment variables\n");
 
         for (key, value) in &self.config.env {
+            // GH-12: Validate env key to prevent command injection
+            if !key.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') || key.is_empty() {
+                continue;
+            }
             match self.shell_type {
                 ShellType::Zsh | ShellType::Bash => {
                     // Escape special characters in value
@@ -109,12 +113,27 @@ impl ShellIntegration {
 
         // Config aliases
         for (name, expansion) in &self.config.aliases {
+            // GH-12: Validate alias name to prevent command injection
+            if !name
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-' || c == '.')
+                || name.is_empty()
+            {
+                continue;
+            }
             let escaped = expansion.replace('\'', "'\\''");
             output.push_str(&format!("alias {name}='{escaped}'\n"));
         }
 
         // Plugin aliases
         for (name, expansion) in self.plugins.all_aliases() {
+            if !name
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-' || c == '.')
+                || name.is_empty()
+            {
+                continue;
+            }
             let escaped = expansion.replace('\'', "'\\''");
             output.push_str(&format!("alias {name}='{escaped}'\n"));
         }
