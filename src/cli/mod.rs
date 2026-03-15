@@ -125,6 +125,20 @@ impl BenchResult {
 
 /// Run benchmark
 pub fn run_bench(iterations: u32, _verbose: bool) -> BenchResult {
+    if iterations == 0 {
+        return BenchResult {
+            iterations: 0,
+            min: Duration::ZERO,
+            max: Duration::ZERO,
+            mean: Duration::ZERO,
+            p50: Duration::ZERO,
+            p95: Duration::ZERO,
+            p99: Duration::ZERO,
+            std_dev: Duration::ZERO,
+            passed: true,
+        };
+    }
+
     let mut times: Vec<Duration> = Vec::with_capacity(iterations as usize);
 
     // Warmup
