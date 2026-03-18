@@ -1,5 +1,6 @@
 # pzsh
 
+[![CI](https://github.com/paiml/pzsh/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pzsh/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/pzsh.svg)](https://crates.io/crates/pzsh)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://github.com/paiml/pzsh)
