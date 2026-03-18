@@ -124,7 +124,10 @@ impl BenchResult {
 }
 
 /// Run benchmark
-pub fn run_bench(iterations: u32, _verbose: bool) -> BenchResult {
+pub fn run_bench(iterations: u32, verbose: bool) -> BenchResult {
+    if verbose {
+        eprintln!("Warning: --verbose is not yet implemented for bench command. Flag ignored.");
+    }
     if iterations == 0 {
         return BenchResult {
             iterations: 0,

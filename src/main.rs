@@ -100,7 +100,10 @@ fn cmd_fix(config: &PathBuf, dry_run: bool) -> ExitCode {
     ExitCode::SUCCESS
 }
 
-fn cmd_profile() -> ExitCode {
+fn cmd_profile(verbose: bool) -> ExitCode {
+    if verbose {
+        eprintln!("Warning: --verbose is not yet implemented for profile command. Flag ignored.");
+    }
     let result = cli::run_profile();
     println!("{}", result.format());
     pass_fail(result.passed)
@@ -154,7 +157,7 @@ fn main() -> ExitCode {
         Commands::Lint { config } => cmd_lint(&config),
         Commands::Compile { config, output } => cmd_compile(&config, output),
         Commands::Fix { config, dry_run } => cmd_fix(&config, dry_run),
-        Commands::Profile { verbose: _ } => cmd_profile(),
+        Commands::Profile { verbose } => cmd_profile(verbose),
         Commands::Status => cmd_status(),
         Commands::Init { shell } => cmd_init(&shell),
     }
