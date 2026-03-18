@@ -2,12 +2,13 @@
 //!
 //! These benchmarks enforce the 10ms startup constraint.
 
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{Criterion, criterion_group, criterion_main};
 use pzsh::Pzsh;
 use pzsh::config::CompiledConfig;
 use pzsh::executor::Executor;
 use pzsh::parser::Parser;
 use pzsh::prompt::Prompt;
+use std::hint::black_box;
 use std::time::Duration;
 
 /// Benchmark full pzsh startup

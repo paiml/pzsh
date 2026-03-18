@@ -282,9 +282,10 @@ mod tests {
     use std::time::Instant;
 
     fn test_config() -> CompiledConfig {
-        let mut config = CompiledConfig::default();
-        config.prompt_format = "{user}@{host} {cwd} {git} {char} ".to_string();
-        config
+        CompiledConfig {
+            prompt_format: "{user}@{host} {cwd} {git} {char} ".to_string(),
+            ..CompiledConfig::default()
+        }
     }
 
     #[test]
@@ -551,8 +552,10 @@ mod tests {
 
     #[test]
     fn test_prompt_custom_segment_render() {
-        let mut config = CompiledConfig::default();
-        config.prompt_format = "{custom} $ ".to_string();
+        let config = CompiledConfig {
+            prompt_format: "{custom} $ ".to_string(),
+            ..CompiledConfig::default()
+        };
         let prompt = Prompt::new(&config);
         let rendered = prompt.render().unwrap();
         assert!(rendered.contains("{custom}"));
@@ -616,9 +619,11 @@ mod tests {
 
     #[test]
     fn test_prompt_root_char() {
-        let mut config = CompiledConfig::default();
-        config.prompt_format = "{char}".to_string();
-        config.colors_enabled = false;
+        let config = CompiledConfig {
+            prompt_format: "{char}".to_string(),
+            colors_enabled: false,
+            ..CompiledConfig::default()
+        };
         let prompt = Prompt::new(&config);
 
         let rendered = prompt.render().unwrap();
@@ -628,9 +633,11 @@ mod tests {
 
     #[test]
     fn test_prompt_all_segments() {
-        let mut config = CompiledConfig::default();
-        config.prompt_format = "{user}@{host}:{cwd} {git} {char} ".to_string();
-        config.colors_enabled = false;
+        let config = CompiledConfig {
+            prompt_format: "{user}@{host}:{cwd} {git} {char} ".to_string(),
+            colors_enabled: false,
+            ..CompiledConfig::default()
+        };
         let mut prompt = Prompt::new(&config);
         prompt.update_git_cache(Some("feature".to_string()), false);
 

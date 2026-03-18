@@ -318,8 +318,8 @@ mod tests {
         // Sort lines for comparison (hash map order may vary)
         let mut lines1: Vec<_> = exports1.lines().collect();
         let mut lines2: Vec<_> = exports2.lines().collect();
-        lines1.sort();
-        lines2.sort();
+        lines1.sort_unstable();
+        lines2.sort_unstable();
 
         assert_eq!(lines1, lines2, "Executor must be deterministic");
     }

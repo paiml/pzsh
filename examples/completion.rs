@@ -115,5 +115,5 @@ fn main() {
     println!("Cursor: {}", ctx.cursor);
     println!("Word: {:?} (starts at {})", ctx.word, ctx.word_start);
     println!("Previous: {:?}", ctx.previous_words);
-    println!("CWD: {:?}", ctx.cwd);
+    println!("CWD: {}", ctx.cwd.display());
 }

@@ -596,18 +596,18 @@ export GOROOT="$(brew --prefix golang)/libexec"
 
     #[test]
     fn test_lint_detects_backticks() {
-        let content = r#"
+        let content = r"
 export DATE=`date`
-"#;
+";
         let result = lint_config(content);
         assert!(!result.passed());
     }
 
     #[test]
     fn test_lint_detects_oh_my_zsh() {
-        let content = r#"
+        let content = r"
 source $ZSH/oh-my-zsh.sh
-"#;
+";
         let result = lint_config(content);
         assert!(!result.passed());
     }
@@ -638,9 +638,9 @@ alias ll="ls -la"
 
     #[test]
     fn test_lint_detects_nvm() {
-        let content = r#"
+        let content = r"
 source ~/.nvm/nvm.sh
-"#;
+";
         let result = lint_config(content);
         assert!(!result.issues.is_empty());
         assert!(result.issues.iter().any(|i| i.message.contains("NVM")));
@@ -648,9 +648,9 @@ source ~/.nvm/nvm.sh
 
     #[test]
     fn test_lint_detects_conda() {
-        let content = r#"
+        let content = r"
 source ~/miniconda3/etc/profile.d/conda.sh
-"#;
+";
         let result = lint_config(content);
         assert!(!result.issues.is_empty());
         assert!(result.issues.iter().any(|i| i.message.contains("conda")));
@@ -675,19 +675,12 @@ eval "$(pyenv init -)"
 "#;
         let result = lint_config(content);
         // Comments should be ignored for backticks and eval, but not for other patterns
-        let eval_issues: Vec<_> = result
-            .issues
-            .iter()
-            .filter(|i| i.message.contains("eval"))
-            .collect();
-        let backtick_issues: Vec<_> = result
-            .issues
-            .iter()
-            .filter(|i| i.message.contains("backtick"))
-            .collect();
-        assert!(eval_issues.is_empty(), "eval in comments should be ignored");
         assert!(
-            backtick_issues.is_empty(),
+            !result.issues.iter().any(|i| i.message.contains("eval")),
+            "eval in comments should be ignored"
+        );
+        assert!(
+            !result.issues.iter().any(|i| i.message.contains("backtick")),
             "backticks in comments should be ignored"
         );
     }

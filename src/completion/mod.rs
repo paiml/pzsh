@@ -1036,7 +1036,7 @@ mod tests {
         let ctx = CompletionContext::from_line("cd ", 3);
         let results = completer.complete(&ctx);
         // Should return current dir entries (may be empty in test env)
-        assert!(results.len() >= 0);
+        let _ = results;
     }
 
     #[test]
@@ -1054,7 +1054,7 @@ mod tests {
         let ctx = CompletionContext::from_line("cd ~/", 5);
         let results = completer.complete(&ctx);
         // Should have some results for home dir
-        assert!(results.len() >= 0);
+        let _ = results;
     }
 
     #[test]

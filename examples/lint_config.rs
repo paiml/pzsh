@@ -1,6 +1,6 @@
 //! Lint configuration example - detect slow patterns
 //!
-//! Run with: cargo run --example lint_config
+//! Run with: `cargo run --example lint_config`
 
 use pzsh::cli::lint_config;
 

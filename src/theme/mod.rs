@@ -761,31 +761,31 @@ mod tests {
 
     #[test]
     fn test_robbyrussell_default() {
-        let theme = RobbyRussellTheme::default();
+        let theme = RobbyRussellTheme;
         assert_eq!(theme.name(), "robbyrussell");
     }
 
     #[test]
     fn test_agnoster_default() {
-        let theme = AgnosterTheme::default();
+        let theme = AgnosterTheme;
         assert_eq!(theme.name(), "agnoster");
     }
 
     #[test]
     fn test_simple_default() {
-        let theme = SimpleTheme::default();
+        let theme = SimpleTheme;
         assert_eq!(theme.name(), "simple");
     }
 
     #[test]
     fn test_pure_default() {
-        let theme = PureTheme::default();
+        let theme = PureTheme;
         assert_eq!(theme.name(), "pure");
     }
 
     #[test]
     fn test_spaceship_default() {
-        let theme = SpaceshipTheme::default();
+        let theme = SpaceshipTheme;
         assert_eq!(theme.name(), "spaceship");
     }
 

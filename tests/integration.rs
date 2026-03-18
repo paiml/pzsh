@@ -128,7 +128,7 @@ fn test_plugin_load_performance() {
     for name in plugins {
         manager
             .load(name)
-            .expect(&format!("Failed to load {}", name));
+            .unwrap_or_else(|_| panic!("Failed to load {}", name));
     }
     let elapsed = start.elapsed();
 

@@ -1,6 +1,6 @@
 //! Basic configuration example
 //!
-//! Run with: cargo run --example basic_config
+//! Run with: `cargo run --example basic_config`
 
 use pzsh::config::CompiledConfig;
 

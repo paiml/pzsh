@@ -12,8 +12,10 @@ fn main() {
     println!();
 
     // Create config with custom prompt format
-    let mut config = CompiledConfig::default();
-    config.prompt_format = "{user}@{host} {cwd} {git} {char} ".to_string();
+    let config = CompiledConfig {
+        prompt_format: "{user}@{host} {cwd} {git} {char} ".to_string(),
+        ..CompiledConfig::default()
+    };
 
     let mut prompt = Prompt::new(&config);
 

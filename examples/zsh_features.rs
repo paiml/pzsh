@@ -1,6 +1,6 @@
 //! Zsh-specific features example
 //!
-//! Run with: cargo run --example zsh_features
+//! Run with: `cargo run --example zsh_features`
 
 use pzsh::zsh::{
     AutoSuggestWidget, CompletionSpec, DirectoryJump, HistorySearch, SyntaxHighlighter,

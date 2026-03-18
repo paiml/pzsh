@@ -1,6 +1,6 @@
 //! Shell initialization example
 //!
-//! Run with: cargo run --example shell_init
+//! Run with: `cargo run --example shell_init`
 
 use pzsh::ShellType;
 use pzsh::config::CompiledConfig;
@@ -10,19 +10,19 @@ fn main() {
     println!("=== pzsh Shell Initialization ===\n");
 
     // Create a sample configuration
-    let mut config = CompiledConfig::default();
-    config.colors_enabled = true;
-    config
-        .aliases
-        .insert("ll".to_string(), "ls -la".to_string());
-    config
-        .aliases
-        .insert("gs".to_string(), "git status".to_string());
-    config
-        .aliases
-        .insert("gp".to_string(), "git push".to_string());
-    config.env.insert("EDITOR".to_string(), "vim".to_string());
-    config.plugins_enabled = vec!["git".to_string()];
+    let mut config = CompiledConfig {
+        colors_enabled: true,
+        aliases: [
+            ("ll".to_string(), "ls -la".to_string()),
+            ("gs".to_string(), "git status".to_string()),
+            ("gp".to_string(), "git push".to_string()),
+        ]
+        .into_iter()
+        .collect(),
+        env: std::iter::once(("EDITOR".to_string(), "vim".to_string())).collect(),
+        plugins_enabled: vec!["git".to_string()],
+        ..CompiledConfig::default()
+    };
 
     // Generate zsh init script
     println!("=== ZSH Init Script ===");

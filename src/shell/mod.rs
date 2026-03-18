@@ -527,17 +527,18 @@ mod tests {
     use super::*;
 
     fn test_config() -> CompiledConfig {
-        let mut config = CompiledConfig::default();
-        config.colors_enabled = true;
-        config
-            .aliases
-            .insert("ll".to_string(), "ls -la".to_string());
-        config
-            .aliases
-            .insert("gs".to_string(), "git status".to_string());
-        config.env.insert("EDITOR".to_string(), "vim".to_string());
-        config.plugins_enabled = vec!["git".to_string()];
-        config
+        CompiledConfig {
+            colors_enabled: true,
+            aliases: [
+                ("ll".to_string(), "ls -la".to_string()),
+                ("gs".to_string(), "git status".to_string()),
+            ]
+            .into_iter()
+            .collect(),
+            env: std::iter::once(("EDITOR".to_string(), "vim".to_string())).collect(),
+            plugins_enabled: vec!["git".to_string()],
+            ..CompiledConfig::default()
+        }
     }
 
     // ==================== ZSH TESTS ====================

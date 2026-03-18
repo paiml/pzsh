@@ -180,8 +180,10 @@ mod tests {
 
     #[test]
     fn test_shell_type_bash() {
-        let mut config = config::CompiledConfig::default();
-        config.shell_type = ShellType::Bash;
+        let config = config::CompiledConfig {
+            shell_type: ShellType::Bash,
+            ..config::CompiledConfig::default()
+        };
         let pzsh = Pzsh::new(config).unwrap();
         assert_eq!(pzsh.shell_type(), ShellType::Bash);
     }
