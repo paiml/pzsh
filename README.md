@@ -275,6 +275,10 @@ Development follows the [Toyota Production System](docs/specifications/pzsh-spec
 - **Kaizen** - Continuous improvement
 - **Genchi Genbutsu** - Go and see for yourself
 
+## Contributing
+
+Contributions welcome. Please run `make lint test` before submitting PRs.
+
 ## 📄 License
 
 MIT

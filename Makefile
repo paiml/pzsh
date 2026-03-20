@@ -2,7 +2,7 @@
 # Performance-first shell framework with sub-10ms startup
 # Following Toyota Way principles for fast feedback loops
 
-.PHONY: all build test coverage coverage-quick coverage-full coverage-ci coverage-open coverage-clean bench lint fmt clean help check quick-check hook-install integration
+.PHONY: all build test test-fast coverage coverage-quick coverage-full coverage-ci coverage-open coverage-clean bench lint fmt clean help check quick-check hook-install integration
 
 # Default target
 all: fmt lint test
@@ -14,6 +14,9 @@ build: ## Build the project
 # Test
 test: ## Run all tests
 	cargo test
+
+test-fast: ## Run lib tests only (fast feedback)
+	cargo test --lib
 
 # Coverage targets (bashrs style)
 # Exclude main.rs (CLI glue code) from coverage
