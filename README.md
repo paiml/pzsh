@@ -1,3 +1,5 @@
+<div align="center">
+
 # pzsh
 
 [![CI](https://github.com/paiml/pzsh/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pzsh/actions/workflows/ci.yml)
@@ -6,6 +8,18 @@
 [![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://github.com/paiml/pzsh)
 
 Performance-first shell framework with sub-10ms startup. Like oh-my-zsh, but **50-200x faster**.
+
+</div>
+
+## Table of Contents
+
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Features](#-features)
+- [Configuration](#️-configuration)
+- [Architecture](#️-architecture)
+- [Contributing](#contributing)
+- [License](#-license)
 
 ## ⚡ Demo
 
@@ -69,7 +83,7 @@ Startup Profile
 └─ total:   0.013ms ✓
 ```
 
-## 📦 Installation
+## Installation
 
 ```bash
 cargo install pzsh
@@ -85,7 +99,7 @@ eval "$(pzsh init zsh)"
 eval "$(pzsh init bash)"
 ```
 
-## 🎨 Features
+## Features
 
 ### oh-my-zsh Compatibility
 
@@ -128,7 +142,7 @@ $ git c<TAB>
   commit (0.85)   checkout (0.72)   clone (0.45)
 ```
 
-## 🔧 Usage
+## Usage
 
 ```bash
 # Initialize configuration
