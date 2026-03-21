@@ -296,3 +296,7 @@ Contributions welcome. Please run `make lint test` before submitting PRs.
 ## 📄 License
 
 MIT
+
+## License
+
+MIT
