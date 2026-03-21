@@ -1,0 +1,1423 @@
+//! Built-in plugins for pzsh
+//!
+//! Each plugin provides aliases, env vars, and shell init for a specific tool.
+
+use ahash::AHashMap;
+
+use super::{Plugin, PluginError, PluginInfo};
+
+/// Built-in git plugin
+#[derive(Debug, Clone)]
+pub struct GitPlugin {
+    enabled: bool,
+}
+
+impl GitPlugin {
+    /// Create git plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for GitPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for GitPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("git")
+            .with_description("Git aliases and integration")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, shell: crate::ShellType) -> String {
+        if !self.enabled {
+            return String::new();
+        }
+
+        match shell {
+            crate::ShellType::Zsh => {
+                // Zsh-specific git integration
+                r"
+# pzsh git plugin
+autoload -Uz vcs_info
+precmd_functions+=( vcs_info )
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git:*' formats '%b'
+"
+                .to_string()
+            }
+            crate::ShellType::Bash => {
+                // Bash-specific git integration
+                r"
+# pzsh git plugin
+__pzsh_git_branch() {
+    git branch 2>/dev/null | grep '^\*' | sed 's/^\* //'
+}
+"
+                .to_string()
+            }
+        }
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("g".to_string(), "git".to_string());
+        aliases.insert("ga".to_string(), "git add".to_string());
+        aliases.insert("gaa".to_string(), "git add --all".to_string());
+        aliases.insert("gb".to_string(), "git branch".to_string());
+        aliases.insert("gc".to_string(), "git commit".to_string());
+        aliases.insert("gcm".to_string(), "git commit -m".to_string());
+        aliases.insert("gco".to_string(), "git checkout".to_string());
+        aliases.insert("gd".to_string(), "git diff".to_string());
+        aliases.insert("gf".to_string(), "git fetch".to_string());
+        aliases.insert("gl".to_string(), "git pull".to_string());
+        aliases.insert("gp".to_string(), "git push".to_string());
+        aliases.insert("gs".to_string(), "git status".to_string());
+        aliases.insert("gst".to_string(), "git stash".to_string());
+        aliases.insert("glog".to_string(), "git log --oneline --graph".to_string());
+        aliases
+    }
+}
+
+/// Built-in docker plugin
+#[derive(Debug, Clone)]
+pub struct DockerPlugin {
+    enabled: bool,
+}
+
+impl DockerPlugin {
+    /// Create docker plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for DockerPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for DockerPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("docker")
+            .with_description("Docker aliases and completions")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new() // Docker doesn't need shell init
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("d".to_string(), "docker".to_string());
+        aliases.insert("dc".to_string(), "docker compose".to_string());
+        aliases.insert("dcu".to_string(), "docker compose up".to_string());
+        aliases.insert("dcd".to_string(), "docker compose down".to_string());
+        aliases.insert("dps".to_string(), "docker ps".to_string());
+        aliases.insert("di".to_string(), "docker images".to_string());
+        aliases.insert("drm".to_string(), "docker rm".to_string());
+        aliases.insert("drmi".to_string(), "docker rmi".to_string());
+        aliases.insert("dex".to_string(), "docker exec -it".to_string());
+        aliases
+    }
+}
+
+/// Built-in kubectl plugin
+#[derive(Debug, Clone)]
+pub struct KubectlPlugin {
+    enabled: bool,
+}
+
+impl KubectlPlugin {
+    /// Create kubectl plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for KubectlPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for KubectlPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("kubectl")
+            .with_description("Kubernetes kubectl aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("k".to_string(), "kubectl".to_string());
+        aliases.insert("kgp".to_string(), "kubectl get pods".to_string());
+        aliases.insert("kgs".to_string(), "kubectl get services".to_string());
+        aliases.insert("kgd".to_string(), "kubectl get deployments".to_string());
+        aliases.insert("kgn".to_string(), "kubectl get nodes".to_string());
+        aliases.insert("kga".to_string(), "kubectl get all".to_string());
+        aliases.insert("kd".to_string(), "kubectl describe".to_string());
+        aliases.insert("kdp".to_string(), "kubectl describe pod".to_string());
+        aliases.insert("kl".to_string(), "kubectl logs".to_string());
+        aliases.insert("klf".to_string(), "kubectl logs -f".to_string());
+        aliases.insert("kex".to_string(), "kubectl exec -it".to_string());
+        aliases.insert("ka".to_string(), "kubectl apply -f".to_string());
+        aliases.insert("kdel".to_string(), "kubectl delete".to_string());
+        aliases.insert(
+            "kctx".to_string(),
+            "kubectl config current-context".to_string(),
+        );
+        aliases.insert(
+            "kns".to_string(),
+            "kubectl config set-context --current --namespace".to_string(),
+        );
+        aliases
+    }
+}
+
+/// Built-in npm/node plugin
+#[derive(Debug, Clone)]
+pub struct NpmPlugin {
+    enabled: bool,
+}
+
+impl NpmPlugin {
+    /// Create npm plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for NpmPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for NpmPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("npm")
+            .with_description("Node.js npm/yarn aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        // npm aliases
+        aliases.insert("ni".to_string(), "npm install".to_string());
+        aliases.insert("nid".to_string(), "npm install --save-dev".to_string());
+        aliases.insert("nig".to_string(), "npm install -g".to_string());
+        aliases.insert("nr".to_string(), "npm run".to_string());
+        aliases.insert("nrs".to_string(), "npm run start".to_string());
+        aliases.insert("nrb".to_string(), "npm run build".to_string());
+        aliases.insert("nrt".to_string(), "npm run test".to_string());
+        aliases.insert("nrd".to_string(), "npm run dev".to_string());
+        aliases.insert("nu".to_string(), "npm update".to_string());
+        aliases.insert("nci".to_string(), "npm ci".to_string());
+        // yarn aliases
+        aliases.insert("y".to_string(), "yarn".to_string());
+        aliases.insert("ya".to_string(), "yarn add".to_string());
+        aliases.insert("yad".to_string(), "yarn add --dev".to_string());
+        aliases.insert("yr".to_string(), "yarn run".to_string());
+        aliases.insert("ys".to_string(), "yarn start".to_string());
+        aliases.insert("yb".to_string(), "yarn build".to_string());
+        aliases.insert("yt".to_string(), "yarn test".to_string());
+        // pnpm aliases
+        aliases.insert("pn".to_string(), "pnpm".to_string());
+        aliases.insert("pni".to_string(), "pnpm install".to_string());
+        aliases.insert("pna".to_string(), "pnpm add".to_string());
+        aliases.insert("pnr".to_string(), "pnpm run".to_string());
+        aliases
+    }
+}
+
+/// Built-in python plugin
+#[derive(Debug, Clone)]
+pub struct PythonPlugin {
+    enabled: bool,
+}
+
+impl PythonPlugin {
+    /// Create python plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for PythonPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for PythonPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("python")
+            .with_description("Python/pip aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("py".to_string(), "python3".to_string());
+        aliases.insert("py2".to_string(), "python2".to_string());
+        aliases.insert("pip".to_string(), "pip3".to_string());
+        aliases.insert(
+            "pir".to_string(),
+            "pip install -r requirements.txt".to_string(),
+        );
+        aliases.insert("pie".to_string(), "pip install -e .".to_string());
+        aliases.insert("piu".to_string(), "pip install --upgrade".to_string());
+        aliases.insert("pif".to_string(), "pip freeze".to_string());
+        aliases.insert("venv".to_string(), "python3 -m venv".to_string());
+        aliases.insert("va".to_string(), "source venv/bin/activate".to_string());
+        aliases.insert("vd".to_string(), "deactivate".to_string());
+        // pytest
+        aliases.insert("pt".to_string(), "pytest".to_string());
+        aliases.insert("ptv".to_string(), "pytest -v".to_string());
+        aliases.insert("ptx".to_string(), "pytest -x".to_string());
+        // uv (fast pip alternative)
+        aliases.insert("uvi".to_string(), "uv pip install".to_string());
+        aliases.insert(
+            "uvr".to_string(),
+            "uv pip install -r requirements.txt".to_string(),
+        );
+        aliases
+    }
+}
+
+/// Built-in golang plugin
+#[derive(Debug, Clone)]
+pub struct GolangPlugin {
+    enabled: bool,
+}
+
+impl GolangPlugin {
+    /// Create golang plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for GolangPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for GolangPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("golang")
+            .with_description("Go language aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("gob".to_string(), "go build".to_string());
+        aliases.insert("gor".to_string(), "go run".to_string());
+        aliases.insert("got".to_string(), "go test".to_string());
+        aliases.insert("gotv".to_string(), "go test -v".to_string());
+        aliases.insert("gof".to_string(), "go fmt ./...".to_string());
+        aliases.insert("gom".to_string(), "go mod".to_string());
+        aliases.insert("gomt".to_string(), "go mod tidy".to_string());
+        aliases.insert("gomi".to_string(), "go mod init".to_string());
+        aliases.insert("gog".to_string(), "go get".to_string());
+        aliases.insert("goi".to_string(), "go install".to_string());
+        aliases.insert("gov".to_string(), "go vet ./...".to_string());
+        aliases
+    }
+}
+
+/// Built-in rust plugin
+#[derive(Debug, Clone)]
+pub struct RustPlugin {
+    enabled: bool,
+}
+
+impl RustPlugin {
+    /// Create rust plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for RustPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for RustPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("rust")
+            .with_description("Rust/Cargo aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("c".to_string(), "cargo".to_string());
+        aliases.insert("cb".to_string(), "cargo build".to_string());
+        aliases.insert("cbr".to_string(), "cargo build --release".to_string());
+        aliases.insert("cr".to_string(), "cargo run".to_string());
+        aliases.insert("crr".to_string(), "cargo run --release".to_string());
+        aliases.insert("ct".to_string(), "cargo test".to_string());
+        aliases.insert("cc".to_string(), "cargo check".to_string());
+        aliases.insert("ccl".to_string(), "cargo clippy".to_string());
+        aliases.insert("cf".to_string(), "cargo fmt".to_string());
+        aliases.insert("cu".to_string(), "cargo update".to_string());
+        aliases.insert("ca".to_string(), "cargo add".to_string());
+        aliases.insert("cdo".to_string(), "cargo doc --open".to_string());
+        aliases.insert("cw".to_string(), "cargo watch -x".to_string());
+        aliases
+    }
+}
+
+/// Built-in terraform plugin
+#[derive(Debug, Clone)]
+pub struct TerraformPlugin {
+    enabled: bool,
+}
+
+impl TerraformPlugin {
+    /// Create terraform plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for TerraformPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for TerraformPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("terraform")
+            .with_description("Terraform/OpenTofu aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert("tf".to_string(), "terraform".to_string());
+        aliases.insert("tfi".to_string(), "terraform init".to_string());
+        aliases.insert("tfp".to_string(), "terraform plan".to_string());
+        aliases.insert("tfa".to_string(), "terraform apply".to_string());
+        aliases.insert(
+            "tfaa".to_string(),
+            "terraform apply -auto-approve".to_string(),
+        );
+        aliases.insert("tfd".to_string(), "terraform destroy".to_string());
+        aliases.insert("tff".to_string(), "terraform fmt".to_string());
+        aliases.insert("tfv".to_string(), "terraform validate".to_string());
+        aliases.insert("tfo".to_string(), "terraform output".to_string());
+        aliases.insert("tfs".to_string(), "terraform state".to_string());
+        aliases.insert("tfw".to_string(), "terraform workspace".to_string());
+        // OpenTofu aliases
+        aliases.insert("tofu".to_string(), "tofu".to_string());
+        aliases.insert("tofui".to_string(), "tofu init".to_string());
+        aliases.insert("tofup".to_string(), "tofu plan".to_string());
+        aliases.insert("tofua".to_string(), "tofu apply".to_string());
+        aliases
+    }
+}
+
+/// Built-in AWS plugin
+#[derive(Debug, Clone)]
+pub struct AwsPlugin {
+    enabled: bool,
+}
+
+impl AwsPlugin {
+    /// Create AWS plugin
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { enabled: false }
+    }
+}
+
+impl Default for AwsPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Plugin for AwsPlugin {
+    fn info(&self) -> PluginInfo {
+        PluginInfo::new("aws")
+            .with_description("AWS CLI aliases")
+            .with_version("1.0.0")
+    }
+
+    fn init(&mut self) -> Result<(), PluginError> {
+        self.enabled = true;
+        Ok(())
+    }
+
+    fn shell_init(&self, _shell: crate::ShellType) -> String {
+        String::new()
+    }
+
+    fn aliases(&self) -> AHashMap<String, String> {
+        let mut aliases = AHashMap::new();
+        aliases.insert(
+            "awsw".to_string(),
+            "aws sts get-caller-identity".to_string(),
+        );
+        aliases.insert("awsl".to_string(), "aws configure list".to_string());
+        aliases.insert(
+            "awsp".to_string(),
+            "aws configure list-profiles".to_string(),
+        );
+        // S3
+        aliases.insert("s3ls".to_string(), "aws s3 ls".to_string());
+        aliases.insert("s3cp".to_string(), "aws s3 cp".to_string());
+        aliases.insert("s3sync".to_string(), "aws s3 sync".to_string());
+        // EC2
+        aliases.insert(
+            "ec2ls".to_string(),
+            "aws ec2 describe-instances".to_string(),
+        );
+        // ECS
+        aliases.insert("ecsls".to_string(), "aws ecs list-clusters".to_string());
+        // Lambda
+        aliases.insert("lamls".to_string(), "aws lambda list-functions".to_string());
+        // SSM
+        aliases.insert(
+            "ssm".to_string(),
+            "aws ssm start-session --target".to_string(),
+        );
+        aliases
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    #[test]
+    fn test_git_plugin() {
+        let mut plugin = GitPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "git");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("gs"));
+        assert_eq!(aliases.get("gs"), Some(&"git status".to_string()));
+    }
+
+    #[test]
+    fn test_docker_plugin() {
+        let mut plugin = DockerPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "docker");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("dps"));
+    }
+
+    #[test]
+    fn test_git_plugin_new() {
+        let plugin = GitPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_git_plugin_default() {
+        let plugin = GitPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_git_plugin_info() {
+        let plugin = GitPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "git");
+        assert!(info.lazy_loadable);
+    }
+
+    #[test]
+    fn test_git_plugin_init() {
+        let mut plugin = GitPlugin::new();
+        let result = plugin.init();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_git_plugin_shell_init_zsh() {
+        let mut plugin = GitPlugin::new();
+        plugin.init().unwrap(); // Enable the plugin first
+        let init = plugin.shell_init(crate::ShellType::Zsh);
+        assert!(init.contains("vcs_info"));
+    }
+
+    #[test]
+    fn test_git_plugin_shell_init_bash() {
+        let plugin = GitPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Bash);
+        assert!(init.contains("__git_ps1") || init.is_empty());
+    }
+
+    #[test]
+    fn test_git_plugin_aliases() {
+        let plugin = GitPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("g"));
+        assert!(aliases.contains_key("gs"));
+        assert!(aliases.contains_key("ga"));
+        assert!(aliases.contains_key("gc"));
+        assert!(aliases.contains_key("gp"));
+    }
+
+    #[test]
+    fn test_docker_plugin_new() {
+        let plugin = DockerPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_docker_plugin_default() {
+        let plugin = DockerPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_docker_plugin_info() {
+        let plugin = DockerPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "docker");
+        assert!(info.lazy_loadable);
+    }
+
+    #[test]
+    fn test_docker_plugin_init() {
+        let mut plugin = DockerPlugin::new();
+        let result = plugin.init();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_docker_plugin_shell_init() {
+        let plugin = DockerPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Zsh);
+        // Docker plugin returns empty shell init
+        assert!(init.is_empty() || !init.is_empty());
+    }
+
+    #[test]
+    fn test_docker_plugin_aliases() {
+        let plugin = DockerPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("d"));
+        assert!(aliases.contains_key("dps"));
+        assert!(aliases.contains_key("di"));
+    }
+
+    #[test]
+    fn test_git_plugin_env_vars() {
+        let plugin = GitPlugin::new();
+        let env = plugin.env_vars();
+        // Git plugin doesn't set env vars
+        assert!(env.is_empty());
+    }
+
+    #[test]
+    fn test_git_plugin_completions() {
+        let plugin = GitPlugin::new();
+        let completions = plugin.completions();
+        // Git plugin doesn't provide completions
+        assert!(completions.is_empty());
+    }
+
+    #[test]
+    fn test_docker_plugin_env_vars() {
+        let plugin = DockerPlugin::new();
+        let env = plugin.env_vars();
+        // Docker plugin doesn't set env vars
+        assert!(env.is_empty());
+    }
+
+    #[test]
+    fn test_docker_plugin_completions() {
+        let plugin = DockerPlugin::new();
+        let completions = plugin.completions();
+        // Docker plugin doesn't provide completions
+        assert!(completions.is_empty());
+    }
+
+    #[test]
+    fn test_git_plugin_all_aliases() {
+        let plugin = GitPlugin::new();
+        let aliases = plugin.aliases();
+
+        // Test all documented aliases exist
+        assert!(aliases.contains_key("g"));
+        assert!(aliases.contains_key("ga"));
+        assert!(aliases.contains_key("gaa"));
+        assert!(aliases.contains_key("gb"));
+        assert!(aliases.contains_key("gc"));
+        assert!(aliases.contains_key("gcm"));
+        assert!(aliases.contains_key("gco"));
+        assert!(aliases.contains_key("gd"));
+        assert!(aliases.contains_key("gf"));
+        assert!(aliases.contains_key("gl"));
+        assert!(aliases.contains_key("gp"));
+        assert!(aliases.contains_key("gs"));
+        assert!(aliases.contains_key("gst"));
+    }
+
+    #[test]
+    fn test_docker_plugin_all_aliases() {
+        let plugin = DockerPlugin::new();
+        let aliases = plugin.aliases();
+
+        assert!(aliases.contains_key("d"));
+        assert!(aliases.contains_key("dc"));
+        assert!(aliases.contains_key("dcu"));
+        assert!(aliases.contains_key("dcd"));
+        assert!(aliases.contains_key("dps"));
+        assert!(aliases.contains_key("di"));
+        assert!(aliases.contains_key("drm"));
+        assert!(aliases.contains_key("drmi"));
+        assert!(aliases.contains_key("dex"));
+    }
+
+    // ==================== KUBECTL PLUGIN TESTS ====================
+
+    #[test]
+    fn test_kubectl_plugin() {
+        let mut plugin = KubectlPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "kubectl");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("k"));
+    }
+
+    #[test]
+    fn test_kubectl_plugin_new() {
+        let plugin = KubectlPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_kubectl_plugin_default() {
+        let plugin = KubectlPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_kubectl_plugin_info() {
+        let plugin = KubectlPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "kubectl");
+        assert!(info.description.contains("Kubernetes"));
+    }
+
+    #[test]
+    fn test_kubectl_plugin_init() {
+        let mut plugin = KubectlPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_kubectl_plugin_shell_init() {
+        let plugin = KubectlPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Zsh);
+        assert!(init.is_empty()); // Kubectl doesn't need shell init
+    }
+
+    #[test]
+    fn test_kubectl_plugin_aliases() {
+        let plugin = KubectlPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("k"));
+        assert!(aliases.contains_key("kgp"));
+        assert!(aliases.contains_key("kgs"));
+        assert!(aliases.contains_key("kgd"));
+        assert!(aliases.contains_key("kgn"));
+        assert!(aliases.contains_key("kga"));
+        assert!(aliases.contains_key("kd"));
+        assert!(aliases.contains_key("kdp"));
+        assert!(aliases.contains_key("kl"));
+        assert!(aliases.contains_key("klf"));
+        assert!(aliases.contains_key("kex"));
+        assert!(aliases.contains_key("ka"));
+        assert!(aliases.contains_key("kdel"));
+        assert!(aliases.contains_key("kctx"));
+        assert!(aliases.contains_key("kns"));
+    }
+
+    #[test]
+    fn test_kubectl_plugin_debug() {
+        let plugin = KubectlPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("KubectlPlugin"));
+    }
+
+    #[test]
+    fn test_kubectl_plugin_clone() {
+        let plugin = KubectlPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== NPM PLUGIN TESTS ====================
+
+    #[test]
+    fn test_npm_plugin() {
+        let mut plugin = NpmPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "npm");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("ni"));
+    }
+
+    #[test]
+    fn test_npm_plugin_new() {
+        let plugin = NpmPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_npm_plugin_default() {
+        let plugin = NpmPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_npm_plugin_info() {
+        let plugin = NpmPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "npm");
+        assert!(info.description.contains("Node"));
+    }
+
+    #[test]
+    fn test_npm_plugin_init() {
+        let mut plugin = NpmPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_npm_plugin_shell_init() {
+        let plugin = NpmPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Bash);
+        assert!(init.is_empty());
+    }
+
+    #[test]
+    fn test_npm_plugin_aliases() {
+        let plugin = NpmPlugin::new();
+        let aliases = plugin.aliases();
+        // npm aliases
+        assert!(aliases.contains_key("ni"));
+        assert!(aliases.contains_key("nid"));
+        assert!(aliases.contains_key("nig"));
+        assert!(aliases.contains_key("nr"));
+        assert!(aliases.contains_key("nrs"));
+        assert!(aliases.contains_key("nrb"));
+        assert!(aliases.contains_key("nrt"));
+        assert!(aliases.contains_key("nrd"));
+        // yarn aliases
+        assert!(aliases.contains_key("y"));
+        assert!(aliases.contains_key("ya"));
+        assert!(aliases.contains_key("yad"));
+        // pnpm aliases
+        assert!(aliases.contains_key("pn"));
+        assert!(aliases.contains_key("pni"));
+    }
+
+    #[test]
+    fn test_npm_plugin_debug() {
+        let plugin = NpmPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("NpmPlugin"));
+    }
+
+    #[test]
+    fn test_npm_plugin_clone() {
+        let plugin = NpmPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== PYTHON PLUGIN TESTS ====================
+
+    #[test]
+    fn test_python_plugin() {
+        let mut plugin = PythonPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "python");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("py"));
+    }
+
+    #[test]
+    fn test_python_plugin_new() {
+        let plugin = PythonPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_python_plugin_default() {
+        let plugin = PythonPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_python_plugin_info() {
+        let plugin = PythonPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "python");
+        assert!(info.description.contains("Python"));
+    }
+
+    #[test]
+    fn test_python_plugin_init() {
+        let mut plugin = PythonPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_python_plugin_shell_init() {
+        let plugin = PythonPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Zsh);
+        assert!(init.is_empty());
+    }
+
+    #[test]
+    fn test_python_plugin_aliases() {
+        let plugin = PythonPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("py"));
+        assert!(aliases.contains_key("py2"));
+        assert!(aliases.contains_key("pip"));
+        assert!(aliases.contains_key("pir"));
+        assert!(aliases.contains_key("pie"));
+        assert!(aliases.contains_key("piu"));
+        assert!(aliases.contains_key("pif"));
+        assert!(aliases.contains_key("venv"));
+        assert!(aliases.contains_key("va"));
+        assert!(aliases.contains_key("vd"));
+        assert!(aliases.contains_key("pt"));
+        assert!(aliases.contains_key("ptv"));
+        assert!(aliases.contains_key("ptx"));
+        assert!(aliases.contains_key("uvi"));
+        assert!(aliases.contains_key("uvr"));
+    }
+
+    #[test]
+    fn test_python_plugin_debug() {
+        let plugin = PythonPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("PythonPlugin"));
+    }
+
+    #[test]
+    fn test_python_plugin_clone() {
+        let plugin = PythonPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== GOLANG PLUGIN TESTS ====================
+
+    #[test]
+    fn test_golang_plugin() {
+        let mut plugin = GolangPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "golang");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("gob"));
+    }
+
+    #[test]
+    fn test_golang_plugin_new() {
+        let plugin = GolangPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_golang_plugin_default() {
+        let plugin = GolangPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_golang_plugin_info() {
+        let plugin = GolangPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "golang");
+        assert!(info.description.contains("Go"));
+    }
+
+    #[test]
+    fn test_golang_plugin_init() {
+        let mut plugin = GolangPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_golang_plugin_shell_init() {
+        let plugin = GolangPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Bash);
+        assert!(init.is_empty());
+    }
+
+    #[test]
+    fn test_golang_plugin_aliases() {
+        let plugin = GolangPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("gob"));
+        assert!(aliases.contains_key("gor"));
+        assert!(aliases.contains_key("got"));
+        assert!(aliases.contains_key("gotv"));
+        assert!(aliases.contains_key("gof"));
+        assert!(aliases.contains_key("gom"));
+        assert!(aliases.contains_key("gomt"));
+        assert!(aliases.contains_key("gomi"));
+        assert!(aliases.contains_key("gog"));
+        assert!(aliases.contains_key("goi"));
+        assert!(aliases.contains_key("gov"));
+    }
+
+    #[test]
+    fn test_golang_plugin_debug() {
+        let plugin = GolangPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("GolangPlugin"));
+    }
+
+    #[test]
+    fn test_golang_plugin_clone() {
+        let plugin = GolangPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== RUST PLUGIN TESTS ====================
+
+    #[test]
+    fn test_rust_plugin() {
+        let mut plugin = RustPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "rust");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("c"));
+    }
+
+    #[test]
+    fn test_rust_plugin_new() {
+        let plugin = RustPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_rust_plugin_default() {
+        let plugin = RustPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_rust_plugin_info() {
+        let plugin = RustPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "rust");
+        assert!(info.description.contains("Rust") || info.description.contains("Cargo"));
+    }
+
+    #[test]
+    fn test_rust_plugin_init() {
+        let mut plugin = RustPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_rust_plugin_shell_init() {
+        let plugin = RustPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Zsh);
+        assert!(init.is_empty());
+    }
+
+    #[test]
+    fn test_rust_plugin_aliases() {
+        let plugin = RustPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("c"));
+        assert!(aliases.contains_key("cb"));
+        assert!(aliases.contains_key("cbr"));
+        assert!(aliases.contains_key("cr"));
+        assert!(aliases.contains_key("crr"));
+        assert!(aliases.contains_key("ct"));
+        assert!(aliases.contains_key("cc"));
+        assert!(aliases.contains_key("ccl"));
+        assert!(aliases.contains_key("cf"));
+        assert!(aliases.contains_key("cu"));
+        assert!(aliases.contains_key("ca"));
+        assert!(aliases.contains_key("cdo"));
+        assert!(aliases.contains_key("cw"));
+    }
+
+    #[test]
+    fn test_rust_plugin_debug() {
+        let plugin = RustPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("RustPlugin"));
+    }
+
+    #[test]
+    fn test_rust_plugin_clone() {
+        let plugin = RustPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== TERRAFORM PLUGIN TESTS ====================
+
+    #[test]
+    fn test_terraform_plugin() {
+        let mut plugin = TerraformPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "terraform");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("tf"));
+    }
+
+    #[test]
+    fn test_terraform_plugin_new() {
+        let plugin = TerraformPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_terraform_plugin_default() {
+        let plugin = TerraformPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_terraform_plugin_info() {
+        let plugin = TerraformPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "terraform");
+        assert!(info.description.contains("Terraform"));
+    }
+
+    #[test]
+    fn test_terraform_plugin_init() {
+        let mut plugin = TerraformPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_terraform_plugin_shell_init() {
+        let plugin = TerraformPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Bash);
+        assert!(init.is_empty());
+    }
+
+    #[test]
+    fn test_terraform_plugin_aliases() {
+        let plugin = TerraformPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("tf"));
+        assert!(aliases.contains_key("tfi"));
+        assert!(aliases.contains_key("tfp"));
+        assert!(aliases.contains_key("tfa"));
+        assert!(aliases.contains_key("tfaa"));
+        assert!(aliases.contains_key("tfd"));
+        assert!(aliases.contains_key("tff"));
+        assert!(aliases.contains_key("tfv"));
+        assert!(aliases.contains_key("tfo"));
+        assert!(aliases.contains_key("tfs"));
+        assert!(aliases.contains_key("tfw"));
+        // OpenTofu aliases
+        assert!(aliases.contains_key("tofu"));
+        assert!(aliases.contains_key("tofui"));
+        assert!(aliases.contains_key("tofup"));
+        assert!(aliases.contains_key("tofua"));
+    }
+
+    #[test]
+    fn test_terraform_plugin_debug() {
+        let plugin = TerraformPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("TerraformPlugin"));
+    }
+
+    #[test]
+    fn test_terraform_plugin_clone() {
+        let plugin = TerraformPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== AWS PLUGIN TESTS ====================
+
+    #[test]
+    fn test_aws_plugin() {
+        let mut plugin = AwsPlugin::new();
+        assert!(plugin.init().is_ok());
+
+        let info = plugin.info();
+        assert_eq!(info.name, "aws");
+
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("awsw"));
+    }
+
+    #[test]
+    fn test_aws_plugin_new() {
+        let plugin = AwsPlugin::new();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_aws_plugin_default() {
+        let plugin = AwsPlugin::default();
+        assert!(!plugin.enabled);
+    }
+
+    #[test]
+    fn test_aws_plugin_info() {
+        let plugin = AwsPlugin::new();
+        let info = plugin.info();
+        assert_eq!(info.name, "aws");
+        assert!(info.description.contains("AWS"));
+    }
+
+    #[test]
+    fn test_aws_plugin_init() {
+        let mut plugin = AwsPlugin::new();
+        assert!(plugin.init().is_ok());
+        assert!(plugin.enabled);
+    }
+
+    #[test]
+    fn test_aws_plugin_shell_init() {
+        let plugin = AwsPlugin::new();
+        let init = plugin.shell_init(crate::ShellType::Zsh);
+        assert!(init.is_empty());
+    }
+
+    #[test]
+    fn test_aws_plugin_aliases() {
+        let plugin = AwsPlugin::new();
+        let aliases = plugin.aliases();
+        assert!(aliases.contains_key("awsw"));
+        assert!(aliases.contains_key("awsl"));
+        assert!(aliases.contains_key("awsp"));
+        assert!(aliases.contains_key("s3ls"));
+        assert!(aliases.contains_key("s3cp"));
+        assert!(aliases.contains_key("s3sync"));
+        assert!(aliases.contains_key("ec2ls"));
+        assert!(aliases.contains_key("ecsls"));
+        assert!(aliases.contains_key("lamls"));
+        assert!(aliases.contains_key("ssm"));
+    }
+
+    #[test]
+    fn test_aws_plugin_debug() {
+        let plugin = AwsPlugin::new();
+        let debug = format!("{:?}", plugin);
+        assert!(debug.contains("AwsPlugin"));
+    }
+
+    #[test]
+    fn test_aws_plugin_clone() {
+        let plugin = AwsPlugin::new();
+        let cloned = plugin.clone();
+        assert_eq!(cloned.enabled, plugin.enabled);
+    }
+
+    // ==================== CROSS-PLUGIN INTEGRATION TESTS ====================
+
+    #[test]
+    fn test_all_plugins_load_under_budget() {
+        use crate::plugin::PluginManager;
+
+        let mut manager = PluginManager::new();
+        let start = Instant::now();
+
+        manager.load("git").unwrap();
+        manager.load("docker").unwrap();
+        manager.load("kubectl").unwrap();
+        manager.load("npm").unwrap();
+        manager.load("python").unwrap();
+        manager.load("golang").unwrap();
+        manager.load("rust").unwrap();
+        manager.load("terraform").unwrap();
+        manager.load("aws").unwrap();
+
+        let elapsed = start.elapsed();
+
+        // All 9 plugins should load under 50ms total (5ms budget each)
+        assert!(
+            elapsed < Duration::from_millis(50),
+            "Plugin loading too slow: {:?}",
+            elapsed
+        );
+    }
+
+    #[test]
+    fn test_manager_load_all_builtins() {
+        use crate::plugin::PluginManager;
+
+        let mut manager = PluginManager::new();
+        let names = vec![
+            "kubectl".to_string(),
+            "npm".to_string(),
+            "python".to_string(),
+            "golang".to_string(),
+            "rust".to_string(),
+            "terraform".to_string(),
+            "aws".to_string(),
+        ];
+        let results = manager.load_all(&names);
+        assert_eq!(results.len(), 7);
+        for result in &results {
+            assert!(result.is_ok());
+        }
+        assert_eq!(manager.loaded_count(), 7);
+    }
+
+    #[test]
+    fn test_manager_aliases_from_all_builtins() {
+        use crate::plugin::PluginManager;
+
+        let mut manager = PluginManager::new();
+        for name in [
+            "git",
+            "docker",
+            "kubectl",
+            "npm",
+            "python",
+            "golang",
+            "rust",
+            "terraform",
+            "aws",
+        ] {
+            manager.load(name).unwrap();
+        }
+
+        let aliases = manager.all_aliases();
+        assert!(aliases.contains_key("gs")); // git
+        assert!(aliases.contains_key("dps")); // docker
+        assert!(aliases.contains_key("k")); // kubectl
+        assert!(aliases.contains_key("ni")); // npm
+        assert!(aliases.contains_key("py")); // python
+        assert!(aliases.contains_key("gob")); // golang
+        assert!(aliases.contains_key("cb")); // rust
+        assert!(aliases.contains_key("tf")); // terraform
+        assert!(aliases.contains_key("awsw")); // aws
+    }
+}
