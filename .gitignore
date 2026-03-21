@@ -25,3 +25,10 @@ target
 
 /target
 book/build/
+
+# PMAT
+.pmat/backup/
+.pmat-qa/
+.pmat/context.idx/
+.pmat/workspace.idx/
+.pmat/deps-cache.json
