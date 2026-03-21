@@ -4,6 +4,7 @@
 
 [![CI](https://github.com/paiml/pzsh/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pzsh/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/pzsh.svg)](https://crates.io/crates/pzsh)
+[![Documentation](https://docs.rs/pzsh/badge.svg)](https://docs.rs/pzsh)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Test Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://github.com/paiml/pzsh)
 
@@ -296,6 +297,10 @@ Contributions welcome. Please run `make lint test` before submitting PRs.
 ## 📄 License
 
 MIT
+
+## See Also
+
+- [Cookbook](https://github.com/paiml/sovereign-ai-cookbook)
 
 ## License
 
