@@ -300,7 +300,7 @@ MIT
 
 ## See Also
 
-- [Cookbook](https://github.com/paiml/sovereign-ai-cookbook)
+- [Cookbook](examples/) — 11 runnable examples
 
 ## License
 
