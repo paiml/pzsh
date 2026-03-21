@@ -28,7 +28,7 @@ coverage: ## Generate HTML coverage report (cold: ~2min, warm: <30s)
 	@which cargo-nextest > /dev/null 2>&1 || (echo "📦 Installing cargo-nextest..." && cargo install cargo-nextest --locked)
 	@mkdir -p target/coverage
 	@echo "🧪 Running tests with instrumentation..."
-	@cargo llvm-cov nextest \
+	@cargo llvm-cov test --lib \
 		--all-features \
 		--html --output-dir target/coverage/html \
 		$(COVERAGE_EXCLUDE)
@@ -40,18 +40,18 @@ coverage: ## Generate HTML coverage report (cold: ~2min, warm: <30s)
 
 coverage-quick: ## Quick coverage check (core tests only)
 	@echo "⚡ Running quick coverage..."
-	@cargo llvm-cov nextest --summary-only
+	@cargo llvm-cov test --lib --summary-only
 
 coverage-full: ## Full coverage including slow tests
 	@echo "🔬 Running full coverage analysis..."
-	@cargo llvm-cov nextest \
+	@cargo llvm-cov test --lib \
 		--all-features \
 		--html --output-dir target/coverage/html
 	@cargo llvm-cov report
 
 coverage-ci: ## Coverage for CI (LCOV output)
 	@echo "🤖 Running CI coverage..."
-	@cargo llvm-cov nextest \
+	@cargo llvm-cov test --lib \
 		--all-features \
 		--lcov --output-path target/coverage/lcov.info
 	@cargo llvm-cov report --summary-only
