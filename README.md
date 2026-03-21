@@ -1,6 +1,5 @@
 <div align="center">
-
-# pzsh
+<h1 align="center">pzsh</h1>
 
 [![CI](https://github.com/paiml/pzsh/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/pzsh/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/pzsh.svg)](https://crates.io/crates/pzsh)
