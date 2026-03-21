@@ -27,7 +27,10 @@ jobs:
     secrets: inherit
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -37,7 +40,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo test --lib
 
   coverage:
@@ -51,7 +54,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-cov-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.os }}-cargo-cov-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo install cargo-llvm-cov --locked || true
       - run: cargo llvm-cov test --lib --lcov --output-path lcov.info
       - uses: codecov/codecov-action@v4
@@ -72,7 +75,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo clippy -- -D warnings
 
   security:
