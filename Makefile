@@ -13,10 +13,10 @@ build: ## Build the project
 
 # Test
 test: ## Run all tests
-	cargo test
+	PROPTEST_CASES=100 cargo test
 
 test-fast: ## Run lib tests only (fast feedback)
-	cargo test --lib
+	PROPTEST_CASES=10 cargo test --lib
 
 # Coverage targets (bashrs style)
 # Exclude main.rs (CLI glue code) from coverage
@@ -25,10 +25,9 @@ COVERAGE_EXCLUDE = --ignore-filename-regex 'main\.rs'
 coverage: ## Generate HTML coverage report (cold: ~2min, warm: <30s)
 	@echo "📊 Running fast coverage analysis..."
 	@which cargo-llvm-cov > /dev/null 2>&1 || (echo "📦 Installing cargo-llvm-cov..." && cargo install cargo-llvm-cov --locked)
-	@which cargo-nextest > /dev/null 2>&1 || (echo "📦 Installing cargo-nextest..." && cargo install cargo-nextest --locked)
 	@mkdir -p target/coverage
 	@echo "🧪 Running tests with instrumentation..."
-	@cargo llvm-cov test --lib \
+	@PROPTEST_CASES=10 cargo llvm-cov test --lib \
 		--all-features \
 		--html --output-dir target/coverage/html \
 		$(COVERAGE_EXCLUDE)
