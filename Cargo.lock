@@ -174,24 +174,25 @@ dependencies = [
 
 [[package]]
 name = "aprender"
-version = "0.26.0"
+version = "0.27.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc343678bd440187ce011feed363fcbecc45c3f4f8580dcdfa2ae452caecd47a"
+checksum = "b9da5a89a3feab012e453372a90aa7f2c35677953bb160a88f1146c0e5688b17"
 dependencies = [
  "batuta-common",
  "bincode",
  "getrandom 0.2.16",
  "memmap2",
  "minijinja",
- "provable-contracts-macros",
- "rand 0.8.5",
- "rand_chacha 0.3.1",
+ "provable-contracts-macros 0.1.1",
+ "rand 0.9.2",
+ "rand_chacha 0.9.0",
  "rayon",
  "rmp-serde",
  "serde",
  "serde_json",
- "serde_yaml",
- "trueno 0.15.0",
+ "serde_yaml_ng",
+ "tempfile",
+ "trueno 0.16.5",
  "trueno-quant",
 ]
 
@@ -1083,12 +1084,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "provable-contracts-macros"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a79b3496cd98fb9767f6ee845a4fda80f3b4a18de4a1477d8a59d527f2e98ac"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "pzsh"
 version = "0.3.5"
 dependencies = [
  "ahash",
  "anyhow",
- "aprender 0.26.0",
+ "aprender 0.27.5",
  "aprender-shell",
  "clap",
  "criterion",
@@ -1101,7 +1113,7 @@ dependencies = [
  "test-case",
  "thiserror 2.0.17",
  "toml 0.9.10+spec-1.1.0",
- "trueno 0.15.0",
+ "trueno 0.16.5",
 ]
 
 [[package]]
@@ -1457,10 +1469,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_yaml"
-version = "0.9.34+deprecated"
+name = "serde_yaml_ng"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
+checksum = "7b4db627b98b36d4203a7b458cf3573730f2bb591b28871d916dfa9efabfd41f"
 dependencies = [
  "indexmap",
  "itoa",
@@ -1698,16 +1710,18 @@ dependencies = [
 
 [[package]]
 name = "trueno"
-version = "0.15.0"
+version = "0.16.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85e19fa22753d395f043b205999122520efd45a33e0867d137f20b777ad794ef"
+checksum = "aef9a7f78a2c56f69a831812f4b82fae90ed5c1451301501a7f1b7af90a789f7"
 dependencies = [
  "anyhow",
  "chrono",
  "hostname",
  "num_cpus",
+ "provable-contracts-macros 0.2.1",
  "serde",
  "serde_json",
+ "serde_yaml_ng",
  "thiserror 2.0.17",
  "toml 0.8.23",
  "trueno-quant",

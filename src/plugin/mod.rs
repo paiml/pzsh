@@ -92,6 +92,7 @@ pub trait Plugin: Send + Sync {
 
     /// Get aliases provided by this plugin
     fn aliases(&self) -> AHashMap<String, String> {
+        contract_pre_startup_budget!(input);
         AHashMap::new()
     }
 
@@ -188,6 +189,7 @@ impl PluginManager {
 
     /// Load a plugin by name
     pub fn load(&mut self, name: &str) -> Result<Duration, PluginError> {
+        contract_pre_config_validation!(name);
         let start = Instant::now();
 
         // Check if already loaded

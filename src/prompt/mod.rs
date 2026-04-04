@@ -143,6 +143,7 @@ impl Prompt {
 
     /// Parse format string into segments
     fn parse_format(format: &str) -> Vec<PromptSegment> {
+        contract_pre_parser_correctness!(format);
         let mut segments = Vec::new();
         let mut current_literal = String::new();
         let mut in_brace = false;
