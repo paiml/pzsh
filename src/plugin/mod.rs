@@ -92,7 +92,7 @@ pub trait Plugin: Send + Sync {
 
     /// Get aliases provided by this plugin
     fn aliases(&self) -> AHashMap<String, String> {
-        contract_pre_startup_budget!(input);
+        contract_pre_startup_budget!();
         AHashMap::new()
     }
 

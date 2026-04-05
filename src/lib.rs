@@ -3,6 +3,10 @@
 //! Core invariant: No shell startup shall exceed 10ms.
 //! This is not a goal—it is a hard constraint.
 
+#[macro_use]
+#[allow(unused_macros)]
+mod generated_contracts;
+
 pub mod cli;
 pub mod color;
 pub mod completion;
