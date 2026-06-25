@@ -1,7 +1,7 @@
 [package]
 exclude = ["tests/", "benches/", "docs/", ".github/", "book/", ".pmat/"]
 name = "pzsh"
-version = "0.3.5"
+version = "0.3.6"
 edition = "2024"
 authors = ["paiml"]
 description = "Performance-first shell framework with sub-10ms startup"
