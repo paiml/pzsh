@@ -57,6 +57,10 @@ test-case = "3"
 name = "startup"
 harness = false
 
+[[bench]]
+name = "completion"
+harness = false
+
 [[example]]
 name = "basic_config"
 path = "examples/basic_config.rs"
