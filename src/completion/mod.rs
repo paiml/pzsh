@@ -540,6 +540,28 @@ impl MlCompletionProvider for AprenderShellCompleter {
     }
 }
 
+/// Deterministic record of the work one completion took.
+///
+/// Every field is a pure function of the inputs — the registered providers, the
+/// alias/history tables they read, and the query — so the same call yields the
+/// same numbers on an idle laptop and on a sixteen-way-contended CI runner.
+/// That is the point: the algorithmic cost of completion is asserted on these
+/// counters rather than on elapsed time, which on a shared runner measures how
+/// busy the host is and not how fast pzsh is.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct CompletionStats {
+    /// Providers whose `complete()` (or `predict()`) actually ran. Fewer than
+    /// the number registered when the `COMPLETION_BUDGET_MS` guard trips, so
+    /// this one field IS load-sensitive by design — it reports the guard.
+    pub providers_run: usize,
+    /// Candidate items the providers produced, before ranking and dedup.
+    pub candidates: usize,
+    /// Comparator invocations spent ranking those candidates by score.
+    pub comparisons: usize,
+    /// Items surviving dedup — the length of the returned vector.
+    pub returned: usize,
+}
+
 /// Main completion engine
 pub struct CompletionEngine {
     providers: Vec<Box<dyn CompletionProvider>>,
@@ -578,9 +600,24 @@ impl CompletionEngine {
     /// Generate completions for input
     #[must_use]
     pub fn complete(&self, line: &str, cursor: usize) -> Vec<CompletionItem> {
+        self.complete_with_stats(line, cursor).0
+    }
+
+    /// Generate completions and report how much work it took.
+    ///
+    /// This is the single implementation; [`CompletionEngine::complete`] is a
+    /// thin wrapper that discards the stats, so the counters describe the real
+    /// production path and not a parallel one written for tests.
+    #[must_use]
+    pub fn complete_with_stats(
+        &self,
+        line: &str,
+        cursor: usize,
+    ) -> (Vec<CompletionItem>, CompletionStats) {
         let start = Instant::now();
         let ctx = CompletionContext::from_line(line, cursor);
 
+        let mut stats = CompletionStats::default();
         let mut results = Vec::new();
 
         // Collect from all providers
@@ -589,6 +626,7 @@ impl CompletionEngine {
                 break; // Budget exceeded
             }
             results.extend(provider.complete(&ctx));
+            stats.providers_run += 1;
         }
 
         // Add ML predictions if available
@@ -596,21 +634,28 @@ impl CompletionEngine {
             if ml.is_ready() && start.elapsed() < Duration::from_millis(COMPLETION_BUDGET_MS) {
                 let predictions = ml.predict(&ctx);
                 results.extend(predictions);
+                stats.providers_run += 1;
             }
         }
 
+        stats.candidates = results.len();
+
         // Sort by score (descending)
+        let mut comparisons = 0usize;
         results.sort_by(|a, b| {
+            comparisons += 1;
             b.score
                 .partial_cmp(&a.score)
                 .unwrap_or(std::cmp::Ordering::Equal)
         });
+        stats.comparisons = comparisons;
 
         // Deduplicate by text
         let mut seen = std::collections::HashSet::new();
         results.retain(|item| seen.insert(item.text.clone()));
 
-        results
+        stats.returned = results.len();
+        (results, stats)
     }
 
     /// Clear completion cache
@@ -739,27 +784,75 @@ mod tests {
         assert!(results.is_empty()); // Not ready
     }
 
-    #[test]
-    fn test_completion_performance() {
+    /// Build an alias-only engine of `n` entries and complete the prefix that
+    /// every one of them matches, returning the work performed.
+    ///
+    /// Alias-only on purpose. `default_engine` also wires `PathCompleter`,
+    /// which reads the process CWD, and the `COMPLETION_BUDGET_MS` guard, which
+    /// can drop later providers when the machine is busy — both would make the
+    /// counters depend on the environment, which is exactly what this test
+    /// exists to stop measuring. `AliasCompleter` is the component whose cost
+    /// scales with the table, and it always runs first (priority 10).
+    fn completion_work(n: usize) -> (usize, CompletionStats) {
         let mut aliases = AHashMap::new();
-        for i in 0..1000 {
+        for i in 0..n {
             aliases.insert(format!("alias{i}"), format!("command{i}"));
         }
 
-        let engine = default_engine(Arc::new(aliases));
+        let mut engine = CompletionEngine::new();
+        engine.add_provider(AliasCompleter::new(Arc::new(aliases)));
 
-        let start = Instant::now();
-        for _ in 0..100 {
-            let _ = engine.complete("alias", 5);
+        let (results, stats) = engine.complete_with_stats("alias", 5);
+        (results.len(), stats)
+    }
+
+    /// Completion cost must stay near-linear in the size of the alias table.
+    ///
+    /// This replaces a wall-clock budget (originally 100ms, later relaxed to
+    /// 500ms "for coverage builds") that failed the clean-room sweep at
+    /// 529.5ms while the identical code measured 85ms on an idle box, and
+    /// 85ms -> 1.26s on that same box once it was loaded. A `Duration`
+    /// assertion here reports how contended the runner is; it cannot report
+    /// whether completion got slower, because a budget wide enough to survive
+    /// the worst contended case is too wide to catch any real regression.
+    ///
+    /// The counters below are a function of the input alone. An accidental
+    /// quadratic — a re-scan of the table per candidate, a ranking pass that
+    /// degrades to insertion sort — moves them; a busy host does not.
+    #[test]
+    fn test_completion_work_scales_subquadratically() {
+        const SMALL: usize = 500;
+        const LARGE: usize = 4000; // 8x SMALL
+
+        for n in [SMALL, LARGE] {
+            let (returned, stats) = completion_work(n);
+
+            // Every alias matches the "alias" prefix, so each must be visited
+            // exactly once and survive dedup. A re-scan inflates `candidates`.
+            assert_eq!(stats.candidates, n, "candidates for n={n}");
+            assert_eq!(stats.returned, n, "returned for n={n}");
+            assert_eq!(returned, n, "result length for n={n}");
+            assert_eq!(stats.providers_run, 1, "providers_run for n={n}");
+
+            // Lower bound: any comparison sort must look at each element at
+            // least once. This is the instrument checking itself — if the
+            // counter were never incremented, the upper bound below would pass
+            // vacuously and this test would guard nothing.
+            assert!(
+                stats.comparisons >= n - 1,
+                "n={n}: only {} comparisons counted; the counter is not wired",
+                stats.comparisons
+            );
+
+            // Upper bound implied by an O(n log n) comparison sort. At n=4000
+            // that is 48_000; a quadratic ranking would need ~8_000_000.
+            let bound = n * (usize::BITS - n.leading_zeros()) as usize;
+            assert!(
+                stats.comparisons <= bound,
+                "n={n}: {} comparisons exceeds the O(n log n) bound of {bound}; ranking has gone quadratic",
+                stats.comparisons
+            );
         }
-        let elapsed = start.elapsed();
-
-        // 100 completions should be fast (relaxed for coverage builds)
-        assert!(
-            elapsed < Duration::from_millis(500),
-            "Completion too slow: {:?}",
-            elapsed
-        );
     }
 
     #[test]
